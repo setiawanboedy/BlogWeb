@@ -3,16 +3,18 @@ package com.tafakkur.blogweb.pages.admin
 import androidx.compose.runtime.*
 import com.tafakkur.blogweb.components.AdminPageLayout
 import com.tafakkur.blogweb.models.Category
+import com.tafakkur.blogweb.pages.admin.components.CategoryDropdown
+import com.tafakkur.blogweb.pages.admin.components.Editor
+import com.tafakkur.blogweb.pages.admin.components.EditorControls
+import com.tafakkur.blogweb.pages.admin.components.ThumbnailUploader
 import com.tafakkur.blogweb.styles.FormInputStyle
 import com.tafakkur.blogweb.util.Constants.FONT_FAMILY
 import com.tafakkur.blogweb.util.Constants.SIDE_PANEL_WIDTH
 import com.tafakkur.blogweb.util.Id
 import com.tafakkur.blogweb.util.JsTheme
-import com.varabyte.kobweb.compose.css.Cursor
 import com.varabyte.kobweb.compose.foundation.layout.*
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.attrsModifier
 import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
@@ -29,12 +31,15 @@ import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.*
+import org.w3c.dom.HTMLInputElement
+import kotlinx.browser.document
 
 data class CreatePageUiState(
     var id: String = "",
     var title: String = "",
     var subtitle: String = "",
     var thumbnail: String = "",
+    var thumbnailInputDisable: Boolean = true,
     var content: String = "",
     var category: Category = Category.Programming,
     var buttonText: String = "Create",
@@ -47,10 +52,10 @@ data class CreatePageUiState(
         id = "",
         title = "",
         subtitle = "",
-        thumbnail="",
-        content="",
-        category=Category.Programming,
-        buttonText="Create",
+        thumbnail = "",
+        content = "",
+        category = Category.Programming,
+        buttonText = "Create",
         editorVisibility = true,
         messagePopup = false,
         linkPopup = false,
@@ -61,7 +66,7 @@ data class CreatePageUiState(
 @Page
 @Composable
 fun CreateScreen() {
-    var uiState by remember{ mutableStateOf(CreatePageUiState()) }
+    var uiState by remember { mutableStateOf(CreatePageUiState()) }
     val breakpoint = rememberBreakpoint()
     AdminPageLayout {
         Box(
@@ -81,7 +86,8 @@ fun CreateScreen() {
                 SimpleGrid(
                     modifier = Modifier
                         .margin(topBottom = 24.px),
-                    numColumns = numColumns(base = 1, sm = 3)) {
+                    numColumns = numColumns(base = 1, sm = 3)
+                ) {
                     Row(
                         modifier = Modifier
                             .margin(
@@ -181,6 +187,64 @@ fun CreateScreen() {
                         uiState = uiState.copy(category = it)
                     }
                 )
+                Box(modifier = Modifier.margin(topBottom = 12.px))
+                Row(
+                    modifier = Modifier.fillMaxWidth()
+                        .margin(topBottom = 12.px),
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Switch(
+                        modifier = Modifier.margin(right = 8.px),
+                        checked = !uiState.thumbnailInputDisable,
+                        onCheckedChange = {
+                            uiState = uiState.copy(thumbnailInputDisable = it)
+                        },
+                        size = SwitchSize.MD
+                    )
+                    SpanText(
+                        modifier = Modifier
+                            .fontSize(14.px)
+                            .fontFamily(FONT_FAMILY)
+                            .color(JsTheme.HalfBlack.rgb),
+                        text = "Paste an Image URL instead"
+                    )
+                }
+                Box(modifier = Modifier.margin(topBottom = 12.px))
+                ThumbnailUploader(
+                    thumbnail = uiState.thumbnail,
+                    thumbnailInputDisabled = uiState.thumbnailInputDisable,
+                    onThumbnailSelect = { filename, file ->
+                        (document.getElementById(Id.thumbnailInput) as HTMLInputElement).value = filename
+                        uiState = uiState.copy(thumbnail = file)
+                    }
+                )
+                Box(modifier = Modifier.margin(topBottom = 12.px))
+                EditorControls(
+                    breakpoint = breakpoint,
+                    editorVisibility = uiState.editorVisibility,
+                    onEditorVisibilityChange = {
+                        uiState = uiState.copy(
+                            editorVisibility = !uiState.editorVisibility
+                        )
+                    },
+                    onLinkClick = {
+                        uiState = uiState.copy(linkPopup = true)
+                    },
+                    onImageClick = {
+                        uiState = uiState.copy(imagePopup = true)
+                    }
+                )
+                Editor(
+                    editorVisibility = uiState.editorVisibility
+                )
+                CreateButton(
+                    text = uiState.buttonText,
+                    onClick = {
+
+
+                    }
+                )
             }
         }
 
@@ -188,61 +252,24 @@ fun CreateScreen() {
 }
 
 @Composable
-fun CategoryDropdown(
-    selectedCategory: Category,
-    onCategorySelect: (Category) -> Unit
+fun CreateButton(
+    text: String,
+    onClick: () -> Unit
 ) {
-
-    Box(
-        modifier = Modifier
-            .margin(topBottom = 12.px)
-            .classNames("dropdown")
+    Button(
+        attrs = Modifier
+            .onClick { onClick() }
             .fillMaxWidth()
             .height(54.px)
-            .backgroundColor(JsTheme.LightGray.rgb)
-            .cursor(Cursor.Pointer)
-            .attrsModifier {
-                attr("data-bs-toggle", "dropdown")
-            }
+            .margin(top = 24.px)
+            .backgroundColor(JsTheme.Primary.rgb)
+            .color(Colors.White)
+            .borderRadius(r = 4.px)
+            .fontFamily(FONT_FAMILY)
+            .fontSize(16.px)
+            .border(width = 0.px)
+            .toAttrs()
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(leftRight = 20.px),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            SpanText(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fontSize(16.px)
-                    .fontFamily(FONT_FAMILY),
-                text = selectedCategory.name
-            )
-            Box(modifier = Modifier.classNames("dropdown-toggle"))
-        }
-
-        Ul(
-            attrs = Modifier
-                .fillMaxWidth()
-                .classNames("dropdown-menu")
-                .toAttrs()
-        ) {
-            Category.entries.forEach { category: Category ->
-                Li {
-                    A(
-                        attrs = Modifier
-                            .classNames("dropdown-item")
-                            .color(Colors.Black)
-                            .fontFamily(FONT_FAMILY)
-                            .fontSize(16.px)
-                            .onClick { onCategorySelect(category) }
-                            .toAttrs()
-                    ) {
-                        Text(value = category.name)
-                    }
-                }
-            }
-        }
+        SpanText(text = text)
     }
 }
