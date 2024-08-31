@@ -12,6 +12,7 @@ enum class JsTheme(
         hex = "#00A2FF",
         rgb = rgb(r = 0, g = 162, b = 255)
     ),
+
     Secondary(
         hex = "#001019",
         rgb = rgb(r = 0, g = 16, b = 25)
