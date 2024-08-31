@@ -1,4 +1,4 @@
-package com.tafakkur.blogweb.pages
+package com.tafakkur.blogweb.pages.admin
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.foundation.layout.Box
@@ -12,7 +12,8 @@ import org.jetbrains.compose.web.dom.Text
 @Composable
 fun HomePage() {
     // TODO: Replace the following with your own content
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text("THIS PAGE INTENTIONALLY LEFT BLANK")
+    Box(
+        modifier =  Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Text("THIS PAGE INTENTIONALL")
     }
 }
