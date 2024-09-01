@@ -14,11 +14,13 @@ import com.tafakkur.blogweb.styles.FormInputStyle
 import com.tafakkur.blogweb.util.*
 import com.tafakkur.blogweb.util.Constants.FONT_FAMILY
 import com.tafakkur.blogweb.util.Constants.SIDE_PANEL_WIDTH
+import com.varabyte.kobweb.compose.css.VerticalAlign
 import com.varabyte.kobweb.compose.foundation.layout.*
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.modifiers.*
+import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.core.Page
 import com.varabyte.kobweb.silk.components.forms.Switch
@@ -70,6 +72,7 @@ data class CreatePageUiState(
 fun CreateScreen() {
     var uiState by remember { mutableStateOf(CreatePageUiState()) }
     val breakpoint = rememberBreakpoint()
+    var isChecked by remember { mutableStateOf(false) }
     AdminPageLayout {
         Box(
             modifier = Modifier
@@ -182,7 +185,6 @@ fun CreateScreen() {
                             attr("placeholder", "Subtitle")
                         }
                 )
-
                 CategoryDropdown(
                     selectedCategory = uiState.category,
                     onCategorySelect = {

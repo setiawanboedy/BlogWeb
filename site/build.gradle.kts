@@ -20,6 +20,13 @@ kobweb {
             description.set("Powered by Kobweb")
 
             head.add {
+                link {
+                    rel = "stylesheet"
+                    href = "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+                }
+                script {
+                    src = "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+                }
                 script {
                     src = "/highlight.min.js"
                 }
@@ -27,14 +34,8 @@ kobweb {
                     rel = "stylesheet"
                     href = "/github-dark.css"
                 }
-                script {
-                    src = "https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
-                }
-                link {
-                    rel = "stylesheet"
-                    href = "https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
-                }
             }
+
         }
 
         // Only legacy sites need this set. Sites built after 0.16.0 should default to DISALLOW.
