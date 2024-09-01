@@ -1,7 +1,7 @@
 package com.tafakkur.blogweb.pages.admin.components
 
 import androidx.compose.runtime.Composable
-import com.tafakkur.blogweb.styles.LoginInputStyle
+import com.tafakkur.blogweb.styles.InputStyle
 import com.tafakkur.blogweb.util.*
 import com.tafakkur.blogweb.util.Constants.FONT_FAMILY
 import com.varabyte.kobweb.compose.css.*
@@ -12,7 +12,6 @@ import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.style.toModifier
 import org.jetbrains.compose.web.css.LineStyle
-import org.jetbrains.compose.web.css.ms
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.TextArea
@@ -23,7 +22,7 @@ fun Editor(editorVisibility: Boolean) {
         modifier = Modifier.fillMaxWidth()
     ) {
         TextArea(
-            attrs = LoginInputStyle.toModifier()
+            attrs = InputStyle.toModifier()
                 .id(Id.editor)
                 .fillMaxWidth()
                 .height(400.px)

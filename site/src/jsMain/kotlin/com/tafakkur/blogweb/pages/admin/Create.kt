@@ -2,16 +2,18 @@ package com.tafakkur.blogweb.pages.admin
 
 import androidx.compose.runtime.*
 import com.tafakkur.blogweb.components.AdminPageLayout
+import com.tafakkur.blogweb.components.ControlPopup
+import com.tafakkur.blogweb.components.MessagePopup
 import com.tafakkur.blogweb.models.Category
+import com.tafakkur.blogweb.models.EditorControl
 import com.tafakkur.blogweb.pages.admin.components.CategoryDropdown
 import com.tafakkur.blogweb.pages.admin.components.Editor
 import com.tafakkur.blogweb.pages.admin.components.EditorControls
 import com.tafakkur.blogweb.pages.admin.components.ThumbnailUploader
 import com.tafakkur.blogweb.styles.FormInputStyle
+import com.tafakkur.blogweb.util.*
 import com.tafakkur.blogweb.util.Constants.FONT_FAMILY
 import com.tafakkur.blogweb.util.Constants.SIDE_PANEL_WIDTH
-import com.tafakkur.blogweb.util.Id
-import com.tafakkur.blogweb.util.JsTheme
 import com.varabyte.kobweb.compose.foundation.layout.*
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
@@ -248,6 +250,51 @@ fun CreateScreen() {
             }
         }
 
+    }
+
+    if (uiState.messagePopup){
+        MessagePopup(
+            message = "Please fill out all fields.",
+            onDialogDismiss = {
+                uiState = uiState.copy(messagePopup = false)
+            }
+        )
+    }
+
+    if (uiState.linkPopup){
+        ControlPopup(
+            editorControl = EditorControl.Link,
+            onDialogDismiss = {
+                uiState = uiState.copy(linkPopup = false)
+            },
+            onAddClick = {href, title ->
+                applyStyle(
+                    ControlStyle.Link(
+                        selectedText = getSelectedText(),
+                        href = href,
+                        title = title
+                    )
+                )
+            }
+        )
+    }
+
+    if (uiState.imagePopup){
+        ControlPopup(
+            editorControl = EditorControl.Image,
+            onDialogDismiss = {
+                uiState = uiState.copy(imagePopup = false)
+            },
+            onAddClick = {imageUrl, description ->
+                applyStyle(
+                    ControlStyle.Image(
+                        selectedText = getSelectedText(),
+                        imageUrl = imageUrl,
+                        alt = description
+                    )
+                )
+            }
+        )
     }
 }
 

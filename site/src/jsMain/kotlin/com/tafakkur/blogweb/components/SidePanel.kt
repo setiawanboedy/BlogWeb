@@ -2,14 +2,20 @@ package com.tafakkur.blogweb.components
 
 import androidx.compose.runtime.*
 import com.tafakkur.blogweb.navigation.Screen
+import com.tafakkur.blogweb.styles.NavigationItemStyle
 import com.tafakkur.blogweb.util.Constants.COLLAPSED_PANEL_HEIGHT
+import com.tafakkur.blogweb.util.Constants.FONT_FAMILY
 import com.tafakkur.blogweb.util.Constants.SIDE_PANEL_WIDTH
+import com.tafakkur.blogweb.util.ControlStyle
+import com.tafakkur.blogweb.util.Id
 import com.tafakkur.blogweb.util.JsTheme
 import com.tafakkur.blogweb.util.Res
 import com.varabyte.kobweb.compose.css.CSSTransition
 import com.varabyte.kobweb.compose.css.Cursor
 import com.varabyte.kobweb.compose.css.Overflow
 import com.varabyte.kobweb.compose.css.ScrollBehavior
+import com.varabyte.kobweb.compose.dom.svg.Path
+import com.varabyte.kobweb.compose.dom.svg.Svg
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.foundation.layout.Column
 import com.varabyte.kobweb.compose.foundation.layout.Row
@@ -17,12 +23,16 @@ import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.modifiers.*
+import com.varabyte.kobweb.compose.ui.thenIf
+import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.core.rememberPageContext
 import com.varabyte.kobweb.silk.components.graphics.Image
 import com.varabyte.kobweb.silk.components.icons.fa.FaBars
 import com.varabyte.kobweb.silk.components.icons.fa.FaXmark
 import com.varabyte.kobweb.silk.components.icons.fa.IconSize
+import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.style.breakpoint.Breakpoint
+import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.breakpoint.rememberBreakpoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -54,8 +64,10 @@ private fun SidePanelInternal(){
             src = Res.Image.logo,
             alt = "Logo Image"
         )
+        NavigationItems()
     }
 }
+
 
 @Composable
 private fun CollapsedSidePanel(onMenuClick: ()->Unit){
@@ -163,6 +175,121 @@ fun OverflowSidePanel(
                 )
             }
             content()
+        }
+    }
+}
+
+@Composable
+fun NavigationItems(){
+    val context = rememberPageContext()
+
+    SpanText(
+        modifier = Modifier
+            .margin(bottom = 30.px)
+            .fontFamily(FONT_FAMILY)
+            .fontSize(14.px)
+            .color(JsTheme.HalfWhite.rgb),
+        text = "Dashboard"
+    )
+    NavigationItem(
+        modifier = Modifier.margin(bottom = 24.px),
+        title = "Home",
+        selected = context.route.path == Screen.AdminHome.route,
+        icon = Res.PathIcon.home,
+        onClick = {
+            context.router.navigateTo(Screen.AdminHome.route)
+        }
+    )
+
+    NavigationItem(
+        modifier = Modifier.margin(bottom = 24.px),
+        selected = context.route.path == Screen.AdminCreate.route,
+        title = "Create Post",
+        icon = Res.PathIcon.create,
+        onClick = {
+            context.router.navigateTo(Screen.AdminCreate.route)
+        }
+    )
+
+    NavigationItem(
+        modifier = Modifier.margin(bottom = 24.px),
+        selected = context.route.path == Screen.AdminMyPosts.route,
+        title = "My Posts",
+        icon = Res.PathIcon.posts,
+        onClick = {
+            context.router.navigateTo(Screen.AdminMyPosts.route)
+        }
+    )
+    NavigationItem(
+        title = "Logout",
+        icon = Res.PathIcon.logout,
+        onClick = {
+//            logout()
+            context.router.navigateTo(Screen.AdminLogin.route)
+        }
+    )
+}
+
+@Composable
+private fun NavigationItem(
+    modifier: Modifier = Modifier,
+    selected: Boolean = false,
+    title: String,
+    icon: String,
+    onClick: () -> Unit
+
+){
+    Row(
+        modifier = NavigationItemStyle.toModifier()
+            .then(modifier)
+            .cursor(Cursor.Pointer)
+            .onClick { onClick() },
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        VectorIcon(
+            modifier = Modifier
+                .margin(right = 10.px),
+            selected = selected,
+            pathData = icon
+        )
+        SpanText(
+            modifier = Modifier
+                .id(Id.navigationText)
+                .fontSize(16.px)
+                .thenIf(
+                    condition = selected,
+                    other = Modifier.color(JsTheme.Primary.rgb)
+                ),
+            text = title
+        )
+    }
+}
+
+@Composable
+private fun VectorIcon(
+    modifier: Modifier = Modifier,
+    selected: Boolean,
+    pathData: String
+){
+    Svg(
+        attrs = modifier
+            .id(Id.svgParent)
+            .width(24.px)
+            .height(24.px)
+            .toAttrs {
+                attr("viewBox","0 0 24 24")
+                attr("fill", "none")
+            }
+    ) {
+        Path {
+            if (selected){
+                attr(attr = "syle", value = "stroke: ${JsTheme.Primary.hex}")
+            }
+            attr(attr = "id", value = Id.vectorIcon)
+            attr(attr = "d", value = pathData)
+            attr(attr = "stroke-width", value = "2")
+            attr(attr = "stroke-linecap", value = "round")
+            attr(attr = "stroke-linejoin", value = "round")
         }
     }
 }
