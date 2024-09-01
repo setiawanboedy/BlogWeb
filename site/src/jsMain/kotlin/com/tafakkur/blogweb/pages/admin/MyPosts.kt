@@ -2,12 +2,15 @@ package com.tafakkur.blogweb.pages.admin
 
 import androidx.compose.runtime.*
 import com.tafakkur.blogweb.components.AdminPageLayout
+import com.tafakkur.blogweb.components.PostView
 import com.tafakkur.blogweb.components.SearchBar
+import com.tafakkur.blogweb.models.PostWithoutDetails
 import com.tafakkur.blogweb.navigation.Screen
 import com.tafakkur.blogweb.util.Constants.FONT_FAMILY
 import com.tafakkur.blogweb.util.Constants.SIDE_PANEL_WIDTH
 import com.tafakkur.blogweb.util.Id
 import com.tafakkur.blogweb.util.JsTheme
+import com.tafakkur.blogweb.util.parseSwitchText
 import com.varabyte.kobweb.compose.css.CSSTransition
 import com.varabyte.kobweb.compose.css.FontWeight
 import com.varabyte.kobweb.compose.css.TransitionProperty
@@ -40,10 +43,11 @@ import org.w3c.dom.HTMLInputElement
 fun MyPostsScreen() {
     val context = rememberPageContext()
     val breakpoint = rememberBreakpoint()
+    val myPosts = remember { mutableStateListOf<PostWithoutDetails>() }
     var selectableMode by remember { mutableStateOf(false) }
     var switchText by remember { mutableStateOf("Select") }
     var showMoreVisibility by remember { mutableStateOf(false) }
-    val selectedPosts = remember { mutableStateListOf<String>() }
+    val selectedPosts = remember { mutableStateListOf<Long>() }
 
     AdminPageLayout {
         Column(
@@ -138,7 +142,24 @@ fun MyPostsScreen() {
                     SpanText(text = "Delete")
                 }
             }
+            PostView(
+                breakpoint = breakpoint,
+                posts =  myPosts,
+                selectableMode = selectableMode,
+                onSelect = {
+                    selectedPosts.add(it)
+                    switchText = parseSwitchText(selectedPosts.toList())
+                },
+                onDeselect = {
+                    selectedPosts.remove(it)
+                    switchText = parseSwitchText(selectedPosts.toList())
+                },
+                showMoreVisibility = showMoreVisibility,
+                onShowMore = {
 
+                },
+                onClick = {}
+            )
         }
     }
 }

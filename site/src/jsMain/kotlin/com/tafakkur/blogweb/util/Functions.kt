@@ -93,3 +93,7 @@ fun applyStyle(controlStyle: ControlStyle){
         document.getElementById(Id.editorPreview)?.innerHTML = getEditor().value
     }
 }
+
+fun parseSwitchText(posts: List<Long>): String {
+    return if (posts.size == 1) "1 Posts Selected" else "${posts.size} Posts Selected"
+}
