@@ -6,7 +6,6 @@ import com.tafakkur.blogweb.styles.NavigationItemStyle
 import com.tafakkur.blogweb.util.Constants.COLLAPSED_PANEL_HEIGHT
 import com.tafakkur.blogweb.util.Constants.FONT_FAMILY
 import com.tafakkur.blogweb.util.Constants.SIDE_PANEL_WIDTH
-import com.tafakkur.blogweb.util.ControlStyle
 import com.tafakkur.blogweb.util.Id
 import com.tafakkur.blogweb.util.JsTheme
 import com.tafakkur.blogweb.util.Res

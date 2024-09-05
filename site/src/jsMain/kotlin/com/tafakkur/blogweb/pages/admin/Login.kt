@@ -1,7 +1,8 @@
 package com.tafakkur.blogweb.pages.admin
 
 import androidx.compose.runtime.*
-import com.tafakkur.blogweb.navigation.Screen
+import com.tafakkur.blogweb.dto.LoginRequest
+import com.tafakkur.blogweb.repository.AuthRepository
 import com.tafakkur.blogweb.styles.InputStyle
 import com.tafakkur.blogweb.util.Constants.FONT_FAMILY
 import com.tafakkur.blogweb.util.Id
@@ -23,15 +24,28 @@ import com.varabyte.kobweb.core.rememberPageContext
 import com.varabyte.kobweb.silk.components.graphics.Image
 import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.style.toModifier
+import kotlinx.browser.document
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.web.attributes.InputType
-import org.jetbrains.compose.web.css.*
+import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.Button
 import org.jetbrains.compose.web.dom.Input
+import org.koin.core.Koin
+import org.koin.core.context.GlobalContext.get
+import org.w3c.dom.HTMLInputElement
+
 
 @Page
 @Composable
 fun LoginScreen() {
     val context = rememberPageContext()
+    val scope = rememberCoroutineScope()
+    var errorText by remember { mutableStateOf("") }
+    val inject: Koin = get()
+    val repository = inject.get<AuthRepository>()
+
+
     Box(
         modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
     ) {
@@ -95,7 +109,22 @@ fun LoginScreen() {
                     .border(0.px)
                     .cursor(Cursor.Pointer)
                     .onClick {
-                        context.router.navigateTo(Screen.AdminHome.route)
+                        scope.launch {
+                            val username =
+                                (document.getElementById(Id.usernameInput) as HTMLInputElement).value
+                            val password =
+                                (document.getElementById(Id.passwordInput) as HTMLInputElement).value
+                            if (username.isNotEmpty() && password.isNotEmpty()) {
+                                val user = repository.login(LoginRequest(username,password))
+                                println(user.data.token)
+                                println(user.data.expiresIn)
+                            } else {
+                                errorText = "Input fields are empty."
+                                delay(3000)
+                                errorText = " "
+                            }
+                        }
+//                        context.router.navigateTo(Screen.AdminHome.route)
                     }
                     .toAttrs()
             ) {

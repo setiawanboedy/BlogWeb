@@ -7,7 +7,6 @@ import com.tafakkur.blogweb.components.Dropdown
 import com.tafakkur.blogweb.components.MessagePopup
 import com.tafakkur.blogweb.models.Category
 import com.tafakkur.blogweb.models.EditorControl
-import com.tafakkur.blogweb.pages.admin.components.CategoryDropdown
 import com.tafakkur.blogweb.pages.admin.components.Editor
 import com.tafakkur.blogweb.pages.admin.components.EditorControls
 import com.tafakkur.blogweb.pages.admin.components.ThumbnailUploader
@@ -15,13 +14,11 @@ import com.tafakkur.blogweb.styles.FormInputStyle
 import com.tafakkur.blogweb.util.*
 import com.tafakkur.blogweb.util.Constants.FONT_FAMILY
 import com.tafakkur.blogweb.util.Constants.SIDE_PANEL_WIDTH
-import com.varabyte.kobweb.compose.css.VerticalAlign
 import com.varabyte.kobweb.compose.foundation.layout.*
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.modifiers.*
-import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.core.Page
 import com.varabyte.kobweb.silk.components.forms.Switch
@@ -32,12 +29,12 @@ import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.breakpoint.rememberBreakpoint
+import kotlinx.browser.document
 import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.*
 import org.w3c.dom.HTMLInputElement
-import kotlinx.browser.document
 
 data class CreatePageUiState(
     var id: String = "",

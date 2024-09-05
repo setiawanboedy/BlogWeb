@@ -3,8 +3,20 @@ jetbrains-compose = "1.6.2"
 kobweb = "0.18.0"
 kotlin = "1.9.23"
 serialization = "1.6.2"
+ktor = "2.0.0"
+koin = "3.1.2"
+
 
 [libraries]
+kobweb-ktor-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+kobweb-ktor-json = { module = "io.ktor:ktor-client-json", version.ref = "ktor" }
+kobweb-ktor-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+kobweb-ktor-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor" }
+kobweb-ktor-serialize = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+kobweb-ktor-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
+
+kobweb-koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
+
 kobweb-api = { module = "com.varabyte.kobweb:kobweb-api", version.ref = "kobweb" }
 kobweb-core = { module = "com.varabyte.kobweb:kobweb-core ", version.ref = "kobweb" }
 kobweb-silk = { module = "com.varabyte.kobweb:kobweb-silk", version.ref = "kobweb" }
