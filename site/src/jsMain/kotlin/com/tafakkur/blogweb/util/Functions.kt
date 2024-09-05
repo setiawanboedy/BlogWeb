@@ -97,3 +97,8 @@ fun applyStyle(controlStyle: ControlStyle){
 fun parseSwitchText(posts: List<Long>): String {
     return if (posts.size == 1) "1 Posts Selected" else "${posts.size} Posts Selected"
 }
+
+fun validateEmail(email: String): Boolean {
+    val regex = "^[A-Za-z](.*)(@)(.+)(\\.)(.+)"
+    return regex.toRegex().matches(email)
+}

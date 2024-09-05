@@ -1,11 +1,13 @@
 package com.tafakkur.blogweb.sections
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import com.tafakkur.blogweb.components.PostPreview
 import com.tafakkur.blogweb.models.PostWithoutDetails
 import com.tafakkur.blogweb.util.Constants.PAGE_WIDTH
 import com.tafakkur.blogweb.util.JsTheme
 import com.varabyte.kobweb.compose.foundation.layout.Box
+import com.varabyte.kobweb.compose.foundation.layout.Column
 import com.varabyte.kobweb.compose.foundation.layout.Row
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
@@ -20,9 +22,10 @@ import org.jetbrains.compose.web.css.px
 @Composable
 fun MainSection(
     breakpoint: Breakpoint,
-//    posts:
+    posts: List<PostWithoutDetails>,
     onClick: (Long) -> Unit
-){
+) {
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -37,6 +40,7 @@ fun MainSection(
         ) {
             MainPosts(
                 breakpoint = breakpoint,
+                posts = posts,
                 onClick = onClick
             )
         }
@@ -46,8 +50,12 @@ fun MainSection(
 @Composable
 fun MainPosts(
     breakpoint: Breakpoint,
+    posts: List<PostWithoutDetails>,
     onClick: (Long) -> Unit
-){
+) {
+    LaunchedEffect(Unit) {
+        println("Logging posts: ${posts.first()}")
+    }
     Row(
         modifier = Modifier
             .fillMaxWidth(
@@ -56,14 +64,66 @@ fun MainPosts(
             )
             .margin(topBottom = 50.px)
     ) {
-        if (breakpoint == Breakpoint.XL){
-            PostPreview(
-                post = mutableListOf<PostWithoutDetails>().first(),
-                darkTheme = true,
-                thumbnailHeight = 640.px,
-                onClick = {onClick(1)}
-            )
+        if (posts.isNotEmpty()) {
 
+            if (breakpoint == Breakpoint.XL) {
+                PostPreview(
+                    post = posts.first(),
+                    darkTheme = true,
+                    thumbnailHeight = 640.px,
+                    onClick = { }
+                )
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth(80.percent)
+                        .margin(left = 20.px)
+                ) {
+                    posts.drop(1).forEach { postWithoutDetails ->
+                        PostPreview(
+                            modifier = Modifier.margin(bottom = 20.px),
+                            post = postWithoutDetails,
+                            darkTheme = true,
+                            vertical = false,
+                            thumbnailHeight = 200.px,
+                            titleMaxLines = 1,
+                            onClick = {
+                                onClick(postWithoutDetails.id)
+                            }
+                        )
+                    }
+                }
+            } else if (breakpoint >= Breakpoint.LG) {
+                Box(
+                    modifier = Modifier
+                        .margin(right = 10.px)
+                ) {
+                    PostPreview(
+                        post = posts.first(),
+                        darkTheme = true,
+                        onClick = { onClick(posts.first().id) }
+                    )
+                }
+                Box(
+                    modifier = Modifier
+                        .margin(left = 10.px)
+                ) {
+                    PostPreview(
+                        post = posts[1],
+                        darkTheme = true,
+                        onClick = { onClick(posts[1].id) }
+                    )
+                }
+
+
+            } else {
+                PostPreview(
+                    post = posts.first(),
+                    darkTheme = true,
+                    thumbnailHeight = 640.px,
+                    onClick = { onClick(posts.first().id) }
+                )
+            }
         }
     }
 }

@@ -3,8 +3,10 @@ package com.tafakkur.blogweb.pages
 import androidx.compose.runtime.*
 import com.tafakkur.blogweb.components.CategoryNavigationItems
 import com.tafakkur.blogweb.components.OverflowSidePanel
+import com.tafakkur.blogweb.models.Category
 import com.tafakkur.blogweb.models.PostWithoutDetails
-import com.tafakkur.blogweb.sections.HeaderSection
+import com.tafakkur.blogweb.navigation.Screen
+import com.tafakkur.blogweb.sections.*
 import com.varabyte.kobweb.compose.foundation.layout.Arrangement
 import com.varabyte.kobweb.compose.foundation.layout.Column
 import com.varabyte.kobweb.compose.ui.Alignment
@@ -16,12 +18,13 @@ import com.varabyte.kobweb.silk.theme.breakpoint.rememberBreakpoint
 
 @Page
 @Composable
-fun HomePage(){
+fun HomePage() {
     val context = rememberPageContext()
     val scope = rememberCoroutineScope()
 
     val breakpoint = rememberBreakpoint()
     var overflowOpened by remember { mutableStateOf(false) }
+    val mainPosts = remember { mutableStateListOf<PostWithoutDetails>() }
     val latestPosts = remember { mutableStateListOf<PostWithoutDetails>() }
     val sponsoredPosts = remember { mutableStateListOf<PostWithoutDetails>() }
     val popularPosts = remember { mutableStateListOf<PostWithoutDetails>() }
@@ -30,22 +33,75 @@ fun HomePage(){
     var showMoreLatest by remember { mutableStateOf(false) }
     var showMorePopular by remember { mutableStateOf(false) }
 
+    LaunchedEffect(Unit) {
+        mainPosts.addAll(
+            listOf(
+                PostWithoutDetails(
+                    id = 1,
+                    author = "Budi",
+                    title = "Kotlin backend",
+                    subtitle = "Kotlin",
+                    thumbnail = "https://i.pinimg.com/736x/3b/fd/25/3bfd258e53765d880b01881eccb2c932.jpg",
+                    status = "PUBLISHED",
+                    category = Category.Programming,
+                    popular = true,
+                    main = false,
+                    sponsored = false,
+                    createdAt = "2024-09-05"
+                )
+            )
+        )
+    }
     Column(
         modifier = Modifier
             .fillMaxSize(),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        if (overflowOpened){
+        if (overflowOpened) {
             OverflowSidePanel(
-                onMenuClose = {overflowOpened = false},
+                onMenuClose = { overflowOpened = false },
                 content = { CategoryNavigationItems(vertical = true) }
             )
         }
         HeaderSection(
             breakpoint = breakpoint,
-            onMenuOpen = {overflowOpened = true}
+            onMenuOpen = { overflowOpened = true }
         )
 
+        MainSection(
+            breakpoint = breakpoint,
+            posts = mainPosts,
+            onClick = { context.router.navigateTo(Screen.PostPage.getPosts(id = it)) }
+        )
+
+        PostSection(
+            breakpoint = breakpoint,
+            posts = mainPosts,
+            title = "Latest Posts",
+            showMoreVisibility = showMoreLatest,
+            onShowMore = {},
+            onClick = { context.router.navigateTo(Screen.PostPage.getPosts(id = it)) }
+        )
+
+        SponsoredPostsSection(
+            breakpoint = breakpoint,
+            posts = mainPosts,
+            onClick = { context.router.navigateTo(Screen.PostPage.getPosts(id = it)) }
+        )
+
+        PostSection(
+            breakpoint = breakpoint,
+            posts = mainPosts,
+            title = "Popular Posts",
+            showMoreVisibility = showMorePopular,
+            onShowMore = {},
+            onClick = { context.router.navigateTo(Screen.PostPage.getPosts(id = it)) }
+        )
+
+        NewsletterSection(
+            breakpoint = breakpoint
+        )
+        FooterSection()
     }
 }
