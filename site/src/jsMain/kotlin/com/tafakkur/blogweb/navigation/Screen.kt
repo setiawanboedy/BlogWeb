@@ -7,7 +7,7 @@ import com.tafakkur.blogweb.models.Constants.QUERY_PARAM
 import com.tafakkur.blogweb.models.Constants.UPDATED_PARAM
 
 sealed class Screen(val route: String){
-    data object AdminHome : Screen(route = "/admin")
+    data object AdminHome : Screen(route = "/admin/")
     data object AdminLogin : Screen(route = "/admin/login")
     data object AdminCreate : Screen(route = "/admin/create"){
         fun passPostId(id: String) = "/admin/create?${POST_ID_PARAM}=$id"

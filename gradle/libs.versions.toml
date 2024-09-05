@@ -6,7 +6,6 @@ serialization = "1.6.2"
 ktor = "2.0.0"
 koin = "3.1.2"
 
-
 [libraries]
 kobweb-ktor-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 kobweb-ktor-json = { module = "io.ktor:ktor-client-json", version.ref = "ktor" }

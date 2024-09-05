@@ -3,6 +3,9 @@ package com.tafakkur.blogweb.util
 import com.tafakkur.blogweb.models.EditorControl
 import kotlinx.browser.document
 import org.w3c.dom.HTMLTextAreaElement
+import kotlin.js.Date
+import kotlin.time.Duration.Companion.milliseconds
+
 
 fun applyControlStyle(
     editorControl: EditorControl,
@@ -101,4 +104,12 @@ fun parseSwitchText(posts: List<Long>): String {
 fun validateEmail(email: String): Boolean {
     val regex = "^[A-Za-z](.*)(@)(.+)(\\.)(.+)"
     return regex.toRegex().matches(email)
+}
+
+fun isTokenExpired(expiresInSeconds: Long): Boolean {
+    val currentTime = Date.now().milliseconds.inWholeMilliseconds
+
+    val expirationTime = Date.now().milliseconds.inWholeMilliseconds + (expiresInSeconds * 1000)
+
+    return currentTime > expirationTime
 }

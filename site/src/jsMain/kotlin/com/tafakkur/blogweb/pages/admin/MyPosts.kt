@@ -10,6 +10,7 @@ import com.tafakkur.blogweb.util.Constants.FONT_FAMILY
 import com.tafakkur.blogweb.util.Constants.SIDE_PANEL_WIDTH
 import com.tafakkur.blogweb.util.Id
 import com.tafakkur.blogweb.util.JsTheme
+import com.tafakkur.blogweb.util.isUserLoggedIn
 import com.tafakkur.blogweb.util.parseSwitchText
 import com.varabyte.kobweb.compose.css.CSSTransition
 import com.varabyte.kobweb.compose.css.FontWeight
@@ -39,6 +40,13 @@ import org.jetbrains.compose.web.dom.Button
 import org.w3c.dom.HTMLInputElement
 
 @Page
+@Composable
+fun MyPostsPage(){
+    isUserLoggedIn{
+        MyPostsScreen()
+    }
+}
+
 @Composable
 fun MyPostsScreen() {
     val context = rememberPageContext()

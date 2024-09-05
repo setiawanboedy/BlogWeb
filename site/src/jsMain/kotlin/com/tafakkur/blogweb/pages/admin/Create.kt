@@ -67,6 +67,13 @@ data class CreatePageUiState(
 
 @Page
 @Composable
+fun CreatePage(){
+    isUserLoggedIn{
+        CreateScreen()
+    }
+}
+
+@Composable
 fun CreateScreen() {
     var uiState by remember { mutableStateOf(CreatePageUiState()) }
     val breakpoint = rememberBreakpoint()

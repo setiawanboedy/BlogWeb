@@ -10,7 +10,7 @@ data class LoginStorage(
 )
 
 interface AuthRepository {
-    suspend fun login(loginRequest: LoginRequest): Response<LoginResponse>
+    suspend fun login(loginRequest: LoginRequest): Response<LoginResponse?>
     fun getToken(): LoginStorage?
     fun clearToken()
 }

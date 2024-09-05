@@ -224,7 +224,6 @@ fun NavigationItems(){
         icon = Res.PathIcon.logout,
         onClick = {
 //            logout()
-            context.router.navigateTo(Screen.AdminLogin.route)
         }
     )
 }
@@ -282,7 +281,7 @@ private fun VectorIcon(
     ) {
         Path {
             if (selected){
-                attr(attr = "syle", value = "stroke: ${JsTheme.Primary.hex}")
+                attr(attr = "style", value = "stroke: ${JsTheme.Primary.hex}")
             }
             attr(attr = "id", value = Id.vectorIcon)
             attr(attr = "d", value = pathData)

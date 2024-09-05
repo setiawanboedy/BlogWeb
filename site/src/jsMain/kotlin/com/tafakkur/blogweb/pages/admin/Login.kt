@@ -2,12 +2,14 @@ package com.tafakkur.blogweb.pages.admin
 
 import androidx.compose.runtime.*
 import com.tafakkur.blogweb.dto.LoginRequest
+import com.tafakkur.blogweb.navigation.Screen
 import com.tafakkur.blogweb.repository.AuthRepository
 import com.tafakkur.blogweb.styles.InputStyle
 import com.tafakkur.blogweb.util.Constants.FONT_FAMILY
 import com.tafakkur.blogweb.util.Id
 import com.tafakkur.blogweb.util.JsTheme
 import com.tafakkur.blogweb.util.Res
+import com.tafakkur.blogweb.util.isUserLoggedIn
 import com.varabyte.kobweb.compose.css.Cursor
 import com.varabyte.kobweb.compose.css.FontWeight
 import com.varabyte.kobweb.compose.css.TextAlign
@@ -37,6 +39,15 @@ import org.w3c.dom.HTMLInputElement
 
 
 @Page
+@Composable
+fun LoginPage(){
+    val context = rememberPageContext()
+    isUserLoggedIn{
+        context.router.navigateTo(Screen.AdminHome.route)
+    }
+    LoginScreen()
+}
+
 @Composable
 fun LoginScreen() {
     val context = rememberPageContext()
@@ -116,15 +127,19 @@ fun LoginScreen() {
                                 (document.getElementById(Id.passwordInput) as HTMLInputElement).value
                             if (username.isNotEmpty() && password.isNotEmpty()) {
                                 val user = repository.login(LoginRequest(username,password))
-                                println(user.data.token)
-                                println(user.data.expiresIn)
+                                if (user.data != null){
+                                    context.router.navigateTo(Screen.AdminHome.route)
+                                }else {
+                                    errorText = "The user doesn't exist."
+                                    delay(3000)
+                                    errorText = " "
+                                }
                             } else {
                                 errorText = "Input fields are empty."
                                 delay(3000)
                                 errorText = " "
                             }
                         }
-//                        context.router.navigateTo(Screen.AdminHome.route)
                     }
                     .toAttrs()
             ) {
@@ -137,7 +152,7 @@ fun LoginScreen() {
                     .color(Colors.Red)
                     .textAlign(TextAlign.Center)
                     .fontFamily(FONT_FAMILY),
-                text = ""
+                text = errorText
             )
         }
     }

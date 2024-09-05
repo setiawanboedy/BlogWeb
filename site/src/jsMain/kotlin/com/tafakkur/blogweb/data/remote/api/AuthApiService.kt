@@ -10,7 +10,7 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 
 class AuthApiService(private val client: HttpClient) {
-    suspend fun login(loginRequest: LoginRequest): Response<LoginResponse> {
+    suspend fun login(loginRequest: LoginRequest): Response<LoginResponse?> {
         return client.post("${Config.BASE_URL}api/auth/login"){
             contentType(ContentType.Application.Json)
             setBody(loginRequest)

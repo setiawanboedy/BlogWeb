@@ -14,11 +14,11 @@ class AuthRepositoryImpl(
     private val authApiService: AuthApiService,
     private val localStorageManager: LocalStorageManager
 ) : AuthRepository {
-    override suspend fun login(loginRequest: LoginRequest): Response<LoginResponse> {
+    override suspend fun login(loginRequest: LoginRequest): Response<LoginResponse?> {
         val response = authApiService.login(loginRequest)
 
-        localStorageManager.setItem(AUTH_TOKEN, response.data.token)
-        localStorageManager.setItem(EXPIRES_AT, response.data.expiresIn.toString())
+        localStorageManager.setItem(AUTH_TOKEN, response.data?.token.toString())
+        localStorageManager.setItem(EXPIRES_AT, response.data?.expiresIn.toString())
         return response
     }
 

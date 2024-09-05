@@ -32,7 +32,7 @@ fun AdminPageLayout(content: @Composable () -> Unit){
                         overflowOpened = false
                     },
                     content = {
-
+                        NavigationItems()
                     }
                 )
             }
