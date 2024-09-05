@@ -3,6 +3,7 @@ package com.tafakkur.blogweb.pages.admin
 import androidx.compose.runtime.*
 import com.tafakkur.blogweb.components.AdminPageLayout
 import com.tafakkur.blogweb.components.ControlPopup
+import com.tafakkur.blogweb.components.Dropdown
 import com.tafakkur.blogweb.components.MessagePopup
 import com.tafakkur.blogweb.models.Category
 import com.tafakkur.blogweb.models.EditorControl
@@ -185,7 +186,7 @@ fun CreateScreen() {
                             attr("placeholder", "Subtitle")
                         }
                 )
-                CategoryDropdown(
+                Dropdown(
                     selectedCategory = uiState.category,
                     onCategorySelect = {
                         uiState = uiState.copy(category = it)
