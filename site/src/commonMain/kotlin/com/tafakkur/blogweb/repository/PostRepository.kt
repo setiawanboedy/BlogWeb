@@ -5,5 +5,5 @@ import com.tafakkur.blogweb.dto.*
 
 typealias ApiPostResponse = ApiResponse<Response<PostResponse>>
 interface PostRepository {
-    suspend fun createPost(postRequest: PostRequest): ApiPostResponse
+    suspend fun createPost(postRequest: PostRequest, thumbnailImage: ByteArray?): ApiPostResponse
 }

@@ -6,6 +6,7 @@ import com.tafakkur.blogweb.core.utils.Constants.AUTH_TOKEN
 import com.tafakkur.blogweb.dto.PostRequest
 import io.ktor.client.*
 import io.ktor.client.request.*
+import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import org.koin.core.Koin
@@ -19,11 +20,28 @@ class PostApiService(private val client: HttpClient) {
         token = storage.getItem(AUTH_TOKEN).toString()
 
     }
-    suspend fun createPost(postRequest: PostRequest): HttpResponse{
-        return client.post("${Config.BASE_URL}api/posts/create"){
+    suspend fun createPost(postRequest: PostRequest, thumbnailImage: ByteArray?): HttpResponse{
+        return client.submitFormWithBinaryData(
+            url = "${Config.BASE_URL}api/posts/create",
+            formData = formData {
+                append("title", postRequest.title)
+                append("subtitle", postRequest.subtitle)
+                append("content", postRequest.content)
+                append("category", postRequest.category)
+                append("tags", JSON.stringify(postRequest.tags))
+                append("status", postRequest.status)
+                if (postRequest.thumbnailLinkUrl.isNotEmpty()){
+                    append("thumbnailLinkUrl", postRequest.thumbnailLinkUrl)
+                }
+
+                if (thumbnailImage != null) {
+                    append("thumbnailImageUrl", thumbnailImage, Headers.build {
+                        append(HttpHeaders.ContentDisposition, "filename=\"thumbnail.png\"")
+                    })
+                }
+            }
+        ) {
             header("Authorization", "Bearer $token")
-            contentType(ContentType.Application.Json)
-            setBody(postRequest)
         }
     }
 }

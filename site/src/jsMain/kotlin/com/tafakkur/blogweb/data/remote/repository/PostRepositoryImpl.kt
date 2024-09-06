@@ -12,24 +12,24 @@ import com.tafakkur.blogweb.repository.AuthRepository
 import com.tafakkur.blogweb.repository.LoginStorage
 import com.tafakkur.blogweb.repository.PostRepository
 import io.ktor.client.call.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
-
 
 
 class PostRepositoryImpl(
     private val postApiService: PostApiService
 ) : PostRepository {
 
-    override suspend fun createPost(postRequest: PostRequest): ApiPostResponse {
+    override suspend fun createPost(postRequest: PostRequest,thumbnailImage: ByteArray?): ApiPostResponse {
         return try {
-            val response = postApiService.createPost(postRequest)
-            if (response.status.isSuccess()){
-            ApiResponse.Success(response.body())
+            val response = postApiService.createPost(postRequest, thumbnailImage)
+            if (response.status.isSuccess()) {
+                ApiResponse.Success(response.body())
 
-            }else{
-                ApiResponse.Error("Error: ${response.status.description}")
+            } else {
+                ApiResponse.Error("Error: ${response.bodyAsText()}")
             }
-        }catch (e: Exception){
+        } catch (e: Exception) {
             ApiResponse.Error("Exception: ${e.message}")
         }
     }

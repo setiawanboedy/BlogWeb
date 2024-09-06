@@ -9,7 +9,8 @@ data class PostRequest(
     val subtitle: String,
     val content: String,
     val category: String,
-    val thumbnailImageUrl: String,
-    val tags: MutableList<String>,
+    val thumbnailName: String,
+    val thumbnailLinkUrl: String,
+    val tags: List<String>,
     val status: String,
 )

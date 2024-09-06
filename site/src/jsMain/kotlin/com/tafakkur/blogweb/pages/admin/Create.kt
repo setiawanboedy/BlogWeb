@@ -14,7 +14,6 @@ import com.tafakkur.blogweb.navigation.Screen
 import com.tafakkur.blogweb.pages.admin.components.Editor
 import com.tafakkur.blogweb.pages.admin.components.EditorControls
 import com.tafakkur.blogweb.pages.admin.components.ThumbnailUploader
-import com.tafakkur.blogweb.repository.AuthRepository
 import com.tafakkur.blogweb.repository.PostRepository
 import com.tafakkur.blogweb.styles.FormInputStyle
 import com.tafakkur.blogweb.util.*
@@ -53,6 +52,8 @@ data class CreatePageUiState(
     var title: String = "",
     var subtitle: String = "",
     var thumbnail: String = "",
+    var thumbnailName: String = "",
+    var thumbnailLinkUrl: String = "",
     var thumbnailInputDisable: Boolean = true,
     var content: String = "",
     var category: Category = Category.Programming,
@@ -69,6 +70,8 @@ data class CreatePageUiState(
         title = "",
         subtitle = "",
         thumbnail = "",
+        thumbnailName = "",
+        thumbnailLinkUrl = "",
         content = "",
         category = Category.Programming,
         tags = mutableListOf(),
@@ -83,8 +86,8 @@ data class CreatePageUiState(
 
 @Page
 @Composable
-fun CreatePage(){
-    isUserLoggedIn{
+fun CreatePage() {
+    isUserLoggedIn {
         CreateScreen()
     }
 
@@ -230,7 +233,7 @@ fun CreateScreen() {
                         modifier = Modifier.margin(right = 8.px),
                         checked = !uiState.thumbnailInputDisable,
                         onCheckedChange = {
-                            uiState = uiState.copy(thumbnailInputDisable = it)
+                            uiState = uiState.copy(thumbnailInputDisable = !it)
                         },
                         size = SwitchSize.MD
                     )
@@ -248,7 +251,7 @@ fun CreateScreen() {
                     thumbnailInputDisabled = uiState.thumbnailInputDisable,
                     onThumbnailSelect = { filename, file ->
                         (document.getElementById(Id.thumbnailInput) as HTMLInputElement).value = filename
-                        uiState = uiState.copy(thumbnail = file)
+                        uiState = uiState.copy(thumbnail = file, thumbnailName = filename)
                     }
                 )
                 Box(modifier = Modifier.margin(topBottom = 12.px))
@@ -273,44 +276,59 @@ fun CreateScreen() {
                 CreateButton(
                     text = uiState.buttonText,
                     onClick = {
-                        uiState = uiState.copy(title = (document.getElementById(Id.titleInput) as HTMLInputElement).value)
-                        uiState = uiState.copy(subtitle = (document.getElementById(Id.subtitleInput) as HTMLInputElement).value)
-                        uiState = uiState.copy(content = (document.getElementById(Id.editor) as HTMLTextAreaElement).value)
-                        uiState = uiState.copy(tags = mutableListOf(Category.Programming.name))
+                        uiState =
+                            uiState.copy(title = (document.getElementById(Id.titleInput) as HTMLInputElement).value)
+                        uiState =
+                            uiState.copy(subtitle = (document.getElementById(Id.subtitleInput) as HTMLInputElement).value)
+                        uiState =
+                            uiState.copy(content = (document.getElementById(Id.editor) as HTMLTextAreaElement).value)
+                        uiState = uiState.copy(tags = mutableListOf(uiState.category.name))
                         uiState = uiState.copy(status = Status.DRAFT)
-                        if (!uiState.thumbnailInputDisable){
-                            uiState = uiState.copy(thumbnail = (document.getElementById(Id.thumbnailInput) as HTMLInputElement).value)
+                        if (!uiState.thumbnailInputDisable) {
+                            uiState =
+                                uiState.copy(thumbnailLinkUrl = (document.getElementById(Id.thumbnailInput) as HTMLInputElement).value)
 
                         }
                         if (
                             uiState.title.isNotEmpty() &&
                             uiState.subtitle.isNotEmpty() &&
-                            uiState.thumbnail.isNotEmpty() &&
+                            uiState.thumbnail.isNotEmpty() || uiState.thumbnailLinkUrl.isNotEmpty() &&
                             uiState.content.isNotEmpty()
-                        ){
+                        ) {
                             scope.launch {
-                                println(uiState.status.name)
                                 val result = repository.createPost(
                                     PostRequest(
                                         title = uiState.title,
                                         subtitle = uiState.subtitle,
-                                        thumbnailImageUrl = uiState.thumbnail,
                                         content = uiState.content,
                                         category = uiState.category.name,
                                         tags = uiState.tags,
-                                        status = "DRAFT"
-                                    )
+                                        thumbnailName = uiState.thumbnailName,
+                                        thumbnailLinkUrl = uiState.thumbnailLinkUrl,
+                                        status = uiState.status.name
+                                    ),
+                                    if (uiState.thumbnail.isNotEmpty()) {
+                                        base64ToByteArray(uiState.thumbnail)
+                                    } else {
+                                        null
+                                    }
                                 )
 
-                                when(result){
+                                when (result) {
                                     is ApiResponse.Success -> {
                                         context.router.navigateTo(Screen.AdminSuccess.route)
                                     }
-                                    is ApiResponse.Error -> {}
-                                    is ApiResponse.Loading -> {}
+
+                                    is ApiResponse.Error -> {
+                                        println("Error: ${result.message}")
+                                    }
+
+                                    is ApiResponse.Loading -> {
+                                        println("Loading...")
+                                    }
                                 }
                             }
-                        }else{
+                        } else {
                             scope.launch {
                                 uiState = uiState.copy(messagePopup = true)
                                 delay(2000)
@@ -324,7 +342,7 @@ fun CreateScreen() {
 
     }
 
-    if (uiState.messagePopup){
+    if (uiState.messagePopup) {
         MessagePopup(
             message = "Please fill out all fields.",
             onDialogDismiss = {
@@ -333,13 +351,13 @@ fun CreateScreen() {
         )
     }
 
-    if (uiState.linkPopup){
+    if (uiState.linkPopup) {
         ControlPopup(
             editorControl = EditorControl.Link,
             onDialogDismiss = {
                 uiState = uiState.copy(linkPopup = false)
             },
-            onAddClick = {href, title ->
+            onAddClick = { href, title ->
                 applyStyle(
                     ControlStyle.Link(
                         selectedText = getSelectedText(),
@@ -351,13 +369,13 @@ fun CreateScreen() {
         )
     }
 
-    if (uiState.imagePopup){
+    if (uiState.imagePopup) {
         ControlPopup(
             editorControl = EditorControl.Image,
             onDialogDismiss = {
                 uiState = uiState.copy(imagePopup = false)
             },
-            onAddClick = {imageUrl, description ->
+            onAddClick = { imageUrl, description ->
                 applyStyle(
                     ControlStyle.Image(
                         selectedText = getSelectedText(),

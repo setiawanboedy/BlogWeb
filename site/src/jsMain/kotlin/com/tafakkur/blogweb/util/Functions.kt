@@ -3,8 +3,9 @@ package com.tafakkur.blogweb.util
 import com.tafakkur.blogweb.models.EditorControl
 import kotlinx.browser.document
 import org.w3c.dom.HTMLTextAreaElement
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.js.Date
-import kotlin.time.Duration.Companion.milliseconds
 
 
 fun applyControlStyle(
@@ -115,4 +116,11 @@ fun isTokenExpired(expiresIn: String?): Boolean {
     val currentTime = Date.now()
 
     return currentTime > expirationTime
+}
+
+@OptIn(ExperimentalEncodingApi::class)
+fun base64ToByteArray(dataUrl: String): ByteArray {
+    val base64Data = dataUrl.substringAfter("base64,")
+
+    return Base64.decode(base64Data)
 }
