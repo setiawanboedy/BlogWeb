@@ -14,21 +14,24 @@ fun isUserLoggedIn(content: @Composable () -> Unit) {
     val storage = inject.get<LocalStorageManager>()
 
     val context = rememberPageContext()
-    val expired = remember { storage.getItem(EXPIRES_AT) }
+    val expiresAt = remember { storage.getItem(EXPIRES_AT) }
 
     var isExpired by remember { mutableStateOf(false) }
 
-    LaunchedEffect(key1 = Unit) {
-        if (!expired.isNullOrEmpty()) {
-            isExpired = isTokenExpired(expired.toLong())
-            println(isExpired)
+    LaunchedEffect(key1 = expiresAt) {
+        if (expiresAt != null) {
+            val isExpiredToken = isTokenExpired(expiresAt)
+            println(isExpiredToken)
+            isExpired = isExpiredToken
         } else {
+            isExpired = true
+        }
+    }
+
+    if (isExpired) {
+        LaunchedEffect(key1 = Unit) {
             context.router.navigateTo(Screen.AdminLogin.route)
         }
-
-    }
-    if (isExpired) {
-        context.router.navigateTo(Screen.AdminLogin.route)
     } else {
         content()
     }

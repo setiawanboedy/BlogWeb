@@ -106,10 +106,13 @@ fun validateEmail(email: String): Boolean {
     return regex.toRegex().matches(email)
 }
 
-fun isTokenExpired(expiresInSeconds: Long): Boolean {
-    val currentTime = Date.now().milliseconds.inWholeMilliseconds
+fun isTokenExpired(expiresIn: String?): Boolean {
 
-    val expirationTime = Date.now().milliseconds.inWholeMilliseconds + (expiresInSeconds * 1000)
+    if (expiresIn == null){
+        return true
+    }
+    val expirationTime = Date(expiresIn).getTime()
+    val currentTime = Date.now()
 
     return currentTime > expirationTime
 }

@@ -5,11 +5,17 @@ import com.tafakkur.blogweb.components.AdminPageLayout
 import com.tafakkur.blogweb.components.ControlPopup
 import com.tafakkur.blogweb.components.Dropdown
 import com.tafakkur.blogweb.components.MessagePopup
+import com.tafakkur.blogweb.core.sealed.ApiResponse
+import com.tafakkur.blogweb.dto.PostRequest
 import com.tafakkur.blogweb.models.Category
 import com.tafakkur.blogweb.models.EditorControl
+import com.tafakkur.blogweb.models.Status
+import com.tafakkur.blogweb.navigation.Screen
 import com.tafakkur.blogweb.pages.admin.components.Editor
 import com.tafakkur.blogweb.pages.admin.components.EditorControls
 import com.tafakkur.blogweb.pages.admin.components.ThumbnailUploader
+import com.tafakkur.blogweb.repository.AuthRepository
+import com.tafakkur.blogweb.repository.PostRepository
 import com.tafakkur.blogweb.styles.FormInputStyle
 import com.tafakkur.blogweb.util.*
 import com.tafakkur.blogweb.util.Constants.FONT_FAMILY
@@ -21,6 +27,7 @@ import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.core.Page
+import com.varabyte.kobweb.core.rememberPageContext
 import com.varabyte.kobweb.silk.components.forms.Switch
 import com.varabyte.kobweb.silk.components.forms.SwitchSize
 import com.varabyte.kobweb.silk.components.layout.SimpleGrid
@@ -30,11 +37,16 @@ import com.varabyte.kobweb.silk.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.breakpoint.rememberBreakpoint
 import kotlinx.browser.document
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.*
+import org.koin.core.Koin
+import org.koin.core.context.GlobalContext.get
 import org.w3c.dom.HTMLInputElement
+import org.w3c.dom.HTMLTextAreaElement
 
 data class CreatePageUiState(
     var id: String = "",
@@ -44,6 +56,8 @@ data class CreatePageUiState(
     var thumbnailInputDisable: Boolean = true,
     var content: String = "",
     var category: Category = Category.Programming,
+    var tags: MutableList<String> = mutableListOf(),
+    var status: Status = Status.DRAFT,
     var buttonText: String = "Create",
     var editorVisibility: Boolean = true,
     var messagePopup: Boolean = false,
@@ -57,6 +71,8 @@ data class CreatePageUiState(
         thumbnail = "",
         content = "",
         category = Category.Programming,
+        tags = mutableListOf(),
+        status = Status.DRAFT,
         buttonText = "Create",
         editorVisibility = true,
         messagePopup = false,
@@ -71,13 +87,20 @@ fun CreatePage(){
     isUserLoggedIn{
         CreateScreen()
     }
+
 }
 
 @Composable
 fun CreateScreen() {
     var uiState by remember { mutableStateOf(CreatePageUiState()) }
     val breakpoint = rememberBreakpoint()
+    val scope = rememberCoroutineScope()
+    val context = rememberPageContext()
     var isChecked by remember { mutableStateOf(false) }
+
+    val inject: Koin = get()
+    val repository = inject.get<PostRepository>()
+
     AdminPageLayout {
         Box(
             modifier = Modifier
@@ -250,8 +273,50 @@ fun CreateScreen() {
                 CreateButton(
                     text = uiState.buttonText,
                     onClick = {
+                        uiState = uiState.copy(title = (document.getElementById(Id.titleInput) as HTMLInputElement).value)
+                        uiState = uiState.copy(subtitle = (document.getElementById(Id.subtitleInput) as HTMLInputElement).value)
+                        uiState = uiState.copy(content = (document.getElementById(Id.editor) as HTMLTextAreaElement).value)
+                        uiState = uiState.copy(tags = mutableListOf(Category.Programming.name))
+                        uiState = uiState.copy(status = Status.DRAFT)
+                        if (!uiState.thumbnailInputDisable){
+                            uiState = uiState.copy(thumbnail = (document.getElementById(Id.thumbnailInput) as HTMLInputElement).value)
 
+                        }
+                        if (
+                            uiState.title.isNotEmpty() &&
+                            uiState.subtitle.isNotEmpty() &&
+                            uiState.thumbnail.isNotEmpty() &&
+                            uiState.content.isNotEmpty()
+                        ){
+                            scope.launch {
+                                println(uiState.status.name)
+                                val result = repository.createPost(
+                                    PostRequest(
+                                        title = uiState.title,
+                                        subtitle = uiState.subtitle,
+                                        thumbnailImageUrl = uiState.thumbnail,
+                                        content = uiState.content,
+                                        category = uiState.category.name,
+                                        tags = uiState.tags,
+                                        status = "DRAFT"
+                                    )
+                                )
 
+                                when(result){
+                                    is ApiResponse.Success -> {
+                                        context.router.navigateTo(Screen.AdminSuccess.route)
+                                    }
+                                    is ApiResponse.Error -> {}
+                                    is ApiResponse.Loading -> {}
+                                }
+                            }
+                        }else{
+                            scope.launch {
+                                uiState = uiState.copy(messagePopup = true)
+                                delay(2000)
+                                uiState = uiState.copy(messagePopup = false)
+                            }
+                        }
                     }
                 )
             }

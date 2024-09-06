@@ -16,4 +16,5 @@ class AuthApiService(private val client: HttpClient) {
             setBody(loginRequest)
         }.body()
     }
+
 }
