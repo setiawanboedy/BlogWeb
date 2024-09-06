@@ -64,5 +64,25 @@ enum class JsTheme(
     Sponsored(
         hex = "#3300FF",
         rgb = rgb(r = 51, g = 0, b = 255)
-    )
+    ),
+
+    Card(
+        hex = "#F2F7FF",
+        rgb = rgb(r = 242, g = 247, b = 255)
+    ),
+
+    Tech(
+        hex = "#57CAEB",
+        rgb = rgb(r = 87, g = 202, b = 235)
+    ),
+
+    Design(
+        hex = "#9694FF",
+        rgb = rgb(r = 150, g = 148, b = 255)
+    ),
+
+    Program(
+        hex = "#5DDAB4",
+        rgb = rgb(r = 93, g = 218, b = 180)
+    ),
 }
