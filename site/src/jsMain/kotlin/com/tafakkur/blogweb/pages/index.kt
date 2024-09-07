@@ -3,10 +3,10 @@ package com.tafakkur.blogweb.pages
 import androidx.compose.runtime.*
 import com.tafakkur.blogweb.components.CategoryNavigationItems
 import com.tafakkur.blogweb.components.OverflowSidePanel
+import com.tafakkur.blogweb.core.sealed.ApiResponse
 import com.tafakkur.blogweb.dto.PostResponse
-import com.tafakkur.blogweb.models.Category
-import com.tafakkur.blogweb.models.PostWithoutDetails
 import com.tafakkur.blogweb.navigation.Screen
+import com.tafakkur.blogweb.repository.PostRepository
 import com.tafakkur.blogweb.sections.*
 import com.varabyte.kobweb.compose.foundation.layout.Arrangement
 import com.varabyte.kobweb.compose.foundation.layout.Column
@@ -16,6 +16,9 @@ import com.varabyte.kobweb.compose.ui.modifiers.fillMaxSize
 import com.varabyte.kobweb.core.Page
 import com.varabyte.kobweb.core.rememberPageContext
 import com.varabyte.kobweb.silk.theme.breakpoint.rememberBreakpoint
+import kotlinx.coroutines.launch
+import org.koin.core.Koin
+import org.koin.core.context.GlobalContext.get
 
 @Page
 @Composable
@@ -34,27 +37,24 @@ fun HomePage() {
     var showMoreLatest by remember { mutableStateOf(false) }
     var showMorePopular by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        mainPosts.addAll(
-            listOf(
-                PostResponse(
-                    id = 1,
-                    author = "Budi",
-                    title = "Kotlin backend",
-                    slug = "kotlin-backend",
-                    subtitle = "Kotlin",
-                    content = "",
-                    thumbnailImageUrl = "https://i.pinimg.com/736x/3b/fd/25/3bfd258e53765d880b01881eccb2c932.jpg",
-                    status = "PUBLISHED",
-                    category = Category.Programming.name,
-                    tags = mutableListOf(),
-                    popular = true,
-                    main = false,
-                    sponsored = false,
-                    createdAt = "2024-09-05"
-                )
-            )
-        )
+    val inject: Koin = get()
+    val repository = inject.get<PostRepository>()
+
+    LaunchedEffect(context.route) {
+        scope.launch {
+            when(val result = repository.getAllPosts()){
+                is ApiResponse.Success -> {
+                    if (result.data.data.isNotEmpty()){
+                        mainPosts.clear()
+                        mainPosts.addAll(result.data.data)
+                    }
+                }
+                is ApiResponse.Error -> {
+                    println(result.message)
+                }
+                is ApiResponse.Loading -> {}
+            }
+        }
     }
     Column(
         modifier = Modifier
@@ -73,11 +73,13 @@ fun HomePage() {
             onMenuOpen = { overflowOpened = true }
         )
 
-        MainSection(
-            breakpoint = breakpoint,
-            posts = mainPosts,
-            onClick = { context.router.navigateTo(Screen.PostPage.getPosts(id = it)) }
-        )
+        if (mainPosts.isNotEmpty()){
+            MainSection(
+                breakpoint = breakpoint,
+                posts = mainPosts,
+                onClick = { context.router.navigateTo(Screen.PostPage.getPosts(id = it)) }
+            )
+        }
 
         PostSection(
             breakpoint = breakpoint,

@@ -11,6 +11,9 @@ data class PostRequest(
     val category: String,
     val thumbnailName: String,
     val thumbnailLinkUrl: String,
+    val main: Boolean,
+    val popular: Boolean,
+    val sponsored: Boolean,
     val tags: List<String>,
     val status: String,
 )

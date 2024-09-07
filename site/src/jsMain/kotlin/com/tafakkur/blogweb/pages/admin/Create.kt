@@ -62,6 +62,9 @@ data class CreatePageUiState(
     var tags: MutableList<String> = mutableListOf(),
     var status: Status = Status.DRAFT,
     var buttonText: String = "Create",
+    var popular: Boolean = false,
+    var main: Boolean = false,
+    var sponsored: Boolean = false,
     var editorVisibility: Boolean = true,
     var messagePopup: Boolean = false,
     var linkPopup: Boolean = false,
@@ -78,6 +81,9 @@ data class CreatePageUiState(
         tags = mutableListOf(),
         status = Status.DRAFT,
         buttonText = "Create",
+        main = false,
+        popular = false,
+        sponsored = false,
         editorVisibility = true,
         messagePopup = false,
         linkPopup = false,
@@ -100,35 +106,39 @@ fun CreateScreen() {
     val breakpoint = rememberBreakpoint()
     val scope = rememberCoroutineScope()
     val context = rememberPageContext()
-//    var isChecked by remember { mutableStateOf(false) }
 
-    val hasPostIdParam = remember(key1 = context.route){
+    val hasPostIdParam = remember(key1 = context.route) {
         context.route.params.containsKey(POST_ID_PARAM)
     }
 
     val inject: Koin = get()
     val repository = inject.get<PostRepository>()
 
-    LaunchedEffect(hasPostIdParam){
-        if (hasPostIdParam){
+    LaunchedEffect(hasPostIdParam) {
+        if (hasPostIdParam) {
             val postId = context.route.params[POST_ID_PARAM] ?: ""
-            when(val result = repository.getPostDetail(id = postId.toLong())){
+            when (val result = repository.getPostDetail(id = postId.toLong())) {
                 is ApiResponse.Success -> {
                     val response = result.data.data
                     (document.getElementById(Id.editor) as HTMLTextAreaElement).value = response.content
                     uiState = uiState.copy(
                         id = response.id,
                         title = response.title,
+                        main = response.main,
+                        popular = response.popular,
+                        sponsored = response.sponsored,
                         subtitle = response.subtitle,
                         content = response.content,
                         category = Category.valueOf(response.category),
                         buttonText = "Update",
                     )
                 }
+
                 is ApiResponse.Error -> {
                     (document.getElementById(Id.editor) as HTMLTextAreaElement).value = ""
                     uiState = uiState.reset()
                 }
+
                 is ApiResponse.Loading -> {
 
                 }
@@ -166,8 +176,10 @@ fun CreateScreen() {
                     ) {
                         Switch(
                             modifier = Modifier.margin(right = 8.px),
-                            checked = true,
-                            onCheckedChange = {},
+                            checked = uiState.popular,
+                            onCheckedChange = {
+                                uiState = uiState.copy(popular = it)
+                            },
                             size = SwitchSize.LG
                         )
                         SpanText(
@@ -188,8 +200,10 @@ fun CreateScreen() {
                     ) {
                         Switch(
                             modifier = Modifier.margin(right = 8.px),
-                            checked = true,
-                            onCheckedChange = {},
+                            checked = uiState.main,
+                            onCheckedChange = {
+                                uiState = uiState.copy(main = it)
+                            },
                             size = SwitchSize.LG
                         )
                         SpanText(
@@ -207,8 +221,10 @@ fun CreateScreen() {
                     ) {
                         Switch(
                             modifier = Modifier.margin(right = 8.px),
-                            checked = false,
-                            onCheckedChange = {},
+                            checked = uiState.sponsored,
+                            onCheckedChange = {
+                                uiState = uiState.copy(sponsored = it)
+                            },
                             size = SwitchSize.LG
                         )
                         SpanText(
@@ -325,12 +341,10 @@ fun CreateScreen() {
                         if (
                             uiState.title.isNotEmpty() &&
                             uiState.subtitle.isNotEmpty() &&
-                            uiState.thumbnail.isNotEmpty() || uiState.thumbnailUrl.isNotEmpty() &&
                             uiState.content.isNotEmpty()
                         ) {
                             scope.launch {
-                                if (hasPostIdParam){
-                                    println(uiState.thumbnail)
+                                if (hasPostIdParam) {
                                     val result = repository.updatePost(
                                         id = uiState.id,
                                         PostRequest(
@@ -341,6 +355,9 @@ fun CreateScreen() {
                                             tags = uiState.tags,
                                             thumbnailName = uiState.thumbnailName,
                                             thumbnailLinkUrl = uiState.thumbnailUrl,
+                                            main = uiState.main,
+                                            popular = uiState.popular,
+                                            sponsored = uiState.sponsored,
                                             status = uiState.status.name
                                         ),
                                         if (uiState.thumbnail.isNotEmpty()) {
@@ -362,7 +379,7 @@ fun CreateScreen() {
                                             println("Loading...")
                                         }
                                     }
-                                }else{
+                                } else {
                                     val result = repository.createPost(
                                         PostRequest(
                                             title = uiState.title,
@@ -372,9 +389,12 @@ fun CreateScreen() {
                                             tags = uiState.tags,
                                             thumbnailName = uiState.thumbnailName,
                                             thumbnailLinkUrl = uiState.thumbnailUrl,
+                                            main = uiState.main,
+                                            popular = uiState.popular,
+                                            sponsored = uiState.sponsored,
                                             status = uiState.status.name
                                         ),
-                                       if (uiState.thumbnail.isNotEmpty()) {
+                                        if (uiState.thumbnail.isNotEmpty()) {
                                             base64ToByteArray(uiState.thumbnail)
                                         } else {
                                             null

@@ -29,6 +29,9 @@ class PostApiService(private val client: HttpClient) {
                 append("content", postRequest.content)
                 append("category", postRequest.category)
                 append("tags", JSON.stringify(postRequest.tags))
+                append("main", postRequest.main.toString())
+                append("popular", postRequest.popular.toString())
+                append("sponsored", postRequest.sponsored.toString())
                 append("status", postRequest.status)
                 if (postRequest.thumbnailLinkUrl.isNotEmpty()){
                     append("thumbnailLinkUrl", postRequest.thumbnailLinkUrl)
@@ -53,6 +56,9 @@ class PostApiService(private val client: HttpClient) {
                 append("subtitle", postRequest.subtitle)
                 append("content", postRequest.content)
                 append("category", postRequest.category)
+                append("main", postRequest.main.toString())
+                append("popular", postRequest.popular.toString())
+                append("sponsored", postRequest.sponsored.toString())
                 append("tags", JSON.stringify(postRequest.tags))
                 append("status", postRequest.status)
                 if (postRequest.thumbnailLinkUrl.isNotEmpty()){
@@ -70,9 +76,10 @@ class PostApiService(private val client: HttpClient) {
         }
     }
 
-    suspend fun getAllPosts(filter: MutableMap<String, Any>): HttpResponse{
+    suspend fun getAllPosts(filter: MutableMap<String, Any>?): HttpResponse{
         return client.get("${Config.BASE_URL}api/posts/list") {
-            filter.entries.forEach { param ->
+
+            filter?.entries?.forEach { param ->
                 parameter(param.key, param.value)
             }
             header("Authorization", "Bearer $token")

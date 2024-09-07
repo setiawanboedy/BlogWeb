@@ -45,7 +45,7 @@ class PostRepositoryImpl(
         }
     }
 
-    override suspend fun getAllPosts(filter: MutableMap<String, Any>): ApiPostsResponse {
+    override suspend fun getAllPosts(filter: MutableMap<String, Any>?): ApiPostsResponse {
         return try {
             val response = postApiService.getAllPosts(filter)
             if (response.status.isSuccess()){
