@@ -5,6 +5,7 @@ import com.tafakkur.blogweb.components.CategoryNavigationItems
 import com.tafakkur.blogweb.components.OverflowSidePanel
 import com.tafakkur.blogweb.core.sealed.ApiResponse
 import com.tafakkur.blogweb.dto.PostResponse
+import com.tafakkur.blogweb.models.Constants.POSTS_PER_PAGE
 import com.tafakkur.blogweb.navigation.Screen
 import com.tafakkur.blogweb.repository.PostRepository
 import com.tafakkur.blogweb.sections.*
@@ -42,11 +43,54 @@ fun HomePage() {
 
     LaunchedEffect(context.route) {
         scope.launch {
-            when(val result = repository.getAllPosts()){
+            //  main
+            when(val result = repository.getAllPosts(mutableMapOf("main" to true))){
                 is ApiResponse.Success -> {
                     if (result.data.data.isNotEmpty()){
                         mainPosts.clear()
                         mainPosts.addAll(result.data.data)
+                    }
+                }
+                is ApiResponse.Error -> {
+                    println(result.message)
+                }
+                is ApiResponse.Loading -> {}
+            }
+
+            //  latestPost
+            when(val result = repository.getAllPosts(mutableMapOf("page" to 0, "size" to POSTS_PER_PAGE))){
+                is ApiResponse.Success -> {
+                    if (result.data.data.isNotEmpty()){
+                        latestPosts.clear()
+                        latestPosts.addAll(result.data.data)
+                    }
+                }
+                is ApiResponse.Error -> {
+                    println(result.message)
+                }
+                is ApiResponse.Loading -> {}
+            }
+
+            //  popular
+            when(val result = repository.getAllPosts(mutableMapOf("popular" to true))){
+                is ApiResponse.Success -> {
+                    if (result.data.data.isNotEmpty()){
+                        popularPosts.clear()
+                        popularPosts.addAll(result.data.data)
+                    }
+                }
+                is ApiResponse.Error -> {
+                    println(result.message)
+                }
+                is ApiResponse.Loading -> {}
+            }
+
+            //  sponsored
+            when(val result = repository.getAllPosts(mutableMapOf("sponsored" to true))){
+                is ApiResponse.Success -> {
+                    if (result.data.data.isNotEmpty()){
+                        sponsoredPosts.clear()
+                        sponsoredPosts.addAll(result.data.data)
                     }
                 }
                 is ApiResponse.Error -> {
@@ -83,7 +127,7 @@ fun HomePage() {
 
         PostSection(
             breakpoint = breakpoint,
-            posts = mainPosts,
+            posts = latestPosts,
             title = "Latest Posts",
             showMoreVisibility = showMoreLatest,
             onShowMore = {},
@@ -92,13 +136,13 @@ fun HomePage() {
 
         SponsoredPostsSection(
             breakpoint = breakpoint,
-            posts = mainPosts,
+            posts = sponsoredPosts,
             onClick = { context.router.navigateTo(Screen.PostPage.getPosts(id = it)) }
         )
 
         PostSection(
             breakpoint = breakpoint,
-            posts = mainPosts,
+            posts = popularPosts,
             title = "Popular Posts",
             showMoreVisibility = showMorePopular,
             onShowMore = {},
