@@ -2,6 +2,7 @@ package com.tafakkur.blogweb.sections
 
 import androidx.compose.runtime.Composable
 import com.tafakkur.blogweb.components.PostPreview
+import com.tafakkur.blogweb.dto.PostResponse
 import com.tafakkur.blogweb.models.PostWithoutDetails
 import com.tafakkur.blogweb.util.Constants.FONT_FAMILY
 import com.tafakkur.blogweb.util.Constants.PAGE_WIDTH
@@ -26,7 +27,7 @@ import org.jetbrains.compose.web.css.px
 @Composable
 fun SponsoredPostsSection(
     breakpoint: Breakpoint,
-    posts: List<PostWithoutDetails>,
+    posts: List<PostResponse>,
     onClick: (Long)->Unit
 ){
     Box(
@@ -56,7 +57,7 @@ fun SponsoredPostsSection(
 @Composable
 fun SponsoredPosts(
     breakpoint: Breakpoint,
-    posts: List<PostWithoutDetails>,
+    posts: List<PostResponse>,
     onClick: (Long) -> Unit
 ){
     Column(

@@ -1,6 +1,7 @@
 package com.tafakkur.blogweb.components
 
 import androidx.compose.runtime.Composable
+import com.tafakkur.blogweb.dto.PostResponse
 import com.tafakkur.blogweb.models.PostWithoutDetails
 import com.tafakkur.blogweb.util.Constants.FONT_FAMILY
 import com.varabyte.kobweb.compose.css.Cursor
@@ -21,7 +22,7 @@ import org.jetbrains.compose.web.css.px
 @Composable
 fun PostView(
     breakpoint: Breakpoint,
-    posts: List<PostWithoutDetails>,
+    posts: List<PostResponse>,
     title: String? = null,
     selectableMode: Boolean = false,
     onSelect: (Long) -> Unit = {},

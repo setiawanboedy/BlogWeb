@@ -2,6 +2,7 @@ package com.tafakkur.blogweb.sections
 
 import androidx.compose.runtime.Composable
 import com.tafakkur.blogweb.components.PostView
+import com.tafakkur.blogweb.dto.PostResponse
 import com.tafakkur.blogweb.models.PostWithoutDetails
 import com.tafakkur.blogweb.util.Constants.PAGE_WIDTH
 import com.varabyte.kobweb.compose.foundation.layout.Box
@@ -16,7 +17,7 @@ import org.jetbrains.compose.web.css.px
 @Composable
 fun PostSection(
     breakpoint: Breakpoint,
-    posts: List<PostWithoutDetails>,
+    posts: List<PostResponse>,
     title: String? = null,
     showMoreVisibility: Boolean,
     onShowMore: ()->Unit,

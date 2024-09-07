@@ -3,6 +3,7 @@ package com.tafakkur.blogweb.pages
 import androidx.compose.runtime.*
 import com.tafakkur.blogweb.components.CategoryNavigationItems
 import com.tafakkur.blogweb.components.OverflowSidePanel
+import com.tafakkur.blogweb.dto.PostResponse
 import com.tafakkur.blogweb.models.Category
 import com.tafakkur.blogweb.models.PostWithoutDetails
 import com.tafakkur.blogweb.navigation.Screen
@@ -24,10 +25,10 @@ fun HomePage() {
 
     val breakpoint = rememberBreakpoint()
     var overflowOpened by remember { mutableStateOf(false) }
-    val mainPosts = remember { mutableStateListOf<PostWithoutDetails>() }
-    val latestPosts = remember { mutableStateListOf<PostWithoutDetails>() }
-    val sponsoredPosts = remember { mutableStateListOf<PostWithoutDetails>() }
-    val popularPosts = remember { mutableStateListOf<PostWithoutDetails>() }
+    val mainPosts = remember { mutableStateListOf<PostResponse>() }
+    val latestPosts = remember { mutableStateListOf<PostResponse>() }
+    val sponsoredPosts = remember { mutableStateListOf<PostResponse>() }
+    val popularPosts = remember { mutableStateListOf<PostResponse>() }
     var latestPostsToSkip by remember { mutableStateOf(0) }
     var popularPostsToSkip by remember { mutableStateOf(0) }
     var showMoreLatest by remember { mutableStateOf(false) }
@@ -36,14 +37,16 @@ fun HomePage() {
     LaunchedEffect(Unit) {
         mainPosts.addAll(
             listOf(
-                PostWithoutDetails(
+                PostResponse(
                     id = 1,
                     author = "Budi",
                     title = "Kotlin backend",
+                    slug = "kotlin-backend",
                     subtitle = "Kotlin",
-                    thumbnail = "https://i.pinimg.com/736x/3b/fd/25/3bfd258e53765d880b01881eccb2c932.jpg",
+                    thumbnailImageUrl = "https://i.pinimg.com/736x/3b/fd/25/3bfd258e53765d880b01881eccb2c932.jpg",
                     status = "PUBLISHED",
-                    category = Category.Programming,
+                    category = Category.Programming.name,
+                    tags = mutableListOf(),
                     popular = true,
                     main = false,
                     sponsored = false,

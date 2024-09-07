@@ -4,8 +4,11 @@ import androidx.compose.runtime.*
 import com.tafakkur.blogweb.components.AdminPageLayout
 import com.tafakkur.blogweb.components.PostView
 import com.tafakkur.blogweb.components.SearchBar
+import com.tafakkur.blogweb.core.sealed.ApiResponse
+import com.tafakkur.blogweb.dto.PostResponse
 import com.tafakkur.blogweb.models.PostWithoutDetails
 import com.tafakkur.blogweb.navigation.Screen
+import com.tafakkur.blogweb.repository.PostRepository
 import com.tafakkur.blogweb.util.Constants.FONT_FAMILY
 import com.tafakkur.blogweb.util.Constants.SIDE_PANEL_WIDTH
 import com.tafakkur.blogweb.util.Id
@@ -33,10 +36,13 @@ import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.theme.breakpoint.rememberBreakpoint
 import kotlinx.browser.document
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.web.css.ms
 import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.Button
+import org.koin.core.Koin
+import org.koin.core.context.GlobalContext.get
 import org.w3c.dom.HTMLInputElement
 
 @Page
@@ -51,11 +57,35 @@ fun MyPostsPage(){
 fun MyPostsScreen() {
     val context = rememberPageContext()
     val breakpoint = rememberBreakpoint()
-    val myPosts = remember { mutableStateListOf<PostWithoutDetails>() }
+    val scope = rememberCoroutineScope()
+    val myPosts = remember { mutableStateListOf<PostResponse>() }
     var selectableMode by remember { mutableStateOf(false) }
     var switchText by remember { mutableStateOf("Select") }
     var showMoreVisibility by remember { mutableStateOf(false) }
     val selectedPosts = remember { mutableStateListOf<Long>() }
+
+    val inject: Koin = get()
+    val repository = inject.get<PostRepository>()
+
+    LaunchedEffect(context.route){
+        val filter: MutableMap<String, Any> = mutableMapOf("page" to 0, "size" to 1)
+        scope.launch {
+           val result = repository.getAllPosts(filter)
+
+            when(result){
+                is ApiResponse.Success -> {
+                    myPosts.clear()
+                    myPosts.addAll(result.data.data)
+                }
+                is ApiResponse.Error -> {
+
+                }
+                is ApiResponse.Loading -> {
+
+                }
+            }
+        }
+    }
 
     AdminPageLayout {
         Column(

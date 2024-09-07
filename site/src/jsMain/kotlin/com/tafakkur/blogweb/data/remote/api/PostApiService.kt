@@ -44,4 +44,11 @@ class PostApiService(private val client: HttpClient) {
             header("Authorization", "Bearer $token")
         }
     }
+
+    suspend fun getAllPosts(filter: MutableMap<String, Any>): HttpResponse{
+        return client.get("${Config.BASE_URL}api/posts/list") {
+            contentType(ContentType.Application.Json)
+            header("Authorization", "Bearer $token")
+        }
+    }
 }
