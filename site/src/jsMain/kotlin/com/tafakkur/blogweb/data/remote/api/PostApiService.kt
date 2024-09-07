@@ -36,7 +36,32 @@ class PostApiService(private val client: HttpClient) {
 
                 if (thumbnailImage != null) {
                     append("thumbnailImageUrl", thumbnailImage, Headers.build {
-                        append(HttpHeaders.ContentDisposition, "filename=\"thumbnail.png\"")
+                        append(HttpHeaders.ContentDisposition, "filename=\"${postRequest.thumbnailName}.png\"")
+                    })
+                }
+            }
+        ) {
+            header("Authorization", "Bearer $token")
+        }
+    }
+
+    suspend fun updatePost(id: Long, postRequest: PostRequest, thumbnailImage: ByteArray?): HttpResponse{
+        return client.submitFormWithBinaryData(
+            url = "${Config.BASE_URL}api/posts/$id/update",
+            formData = formData {
+                append("title", postRequest.title)
+                append("subtitle", postRequest.subtitle)
+                append("content", postRequest.content)
+                append("category", postRequest.category)
+                append("tags", JSON.stringify(postRequest.tags))
+                append("status", postRequest.status)
+                if (postRequest.thumbnailLinkUrl.isNotEmpty()){
+                    append("thumbnailLinkUrl", postRequest.thumbnailLinkUrl)
+                }
+
+                if (thumbnailImage != null) {
+                    append("thumbnailImageUrl", thumbnailImage, Headers.build {
+                        append(HttpHeaders.ContentDisposition, "filename=\"${postRequest.thumbnailName}.png\"")
                     })
                 }
             }
@@ -50,6 +75,12 @@ class PostApiService(private val client: HttpClient) {
             filter.entries.forEach { param ->
                 parameter(param.key, param.value)
             }
+            header("Authorization", "Bearer $token")
+        }
+    }
+
+    suspend fun getPostDetail(id: Long): HttpResponse{
+        return client.get("${Config.BASE_URL}api/posts/$id/detail") {
             header("Authorization", "Bearer $token")
         }
     }

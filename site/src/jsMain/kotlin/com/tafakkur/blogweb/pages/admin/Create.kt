@@ -8,6 +8,7 @@ import com.tafakkur.blogweb.components.MessagePopup
 import com.tafakkur.blogweb.core.sealed.ApiResponse
 import com.tafakkur.blogweb.dto.PostRequest
 import com.tafakkur.blogweb.models.Category
+import com.tafakkur.blogweb.models.Constants.POST_ID_PARAM
 import com.tafakkur.blogweb.models.EditorControl
 import com.tafakkur.blogweb.models.Status
 import com.tafakkur.blogweb.navigation.Screen
@@ -19,6 +20,7 @@ import com.tafakkur.blogweb.styles.FormInputStyle
 import com.tafakkur.blogweb.util.*
 import com.tafakkur.blogweb.util.Constants.FONT_FAMILY
 import com.tafakkur.blogweb.util.Constants.SIDE_PANEL_WIDTH
+import com.varabyte.kobweb.compose.css.Cursor
 import com.varabyte.kobweb.compose.foundation.layout.*
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
@@ -48,12 +50,12 @@ import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.HTMLTextAreaElement
 
 data class CreatePageUiState(
-    var id: String = "",
+    var id: Long = 0,
     var title: String = "",
     var subtitle: String = "",
     var thumbnail: String = "",
+    var thumbnailUrl: String = "",
     var thumbnailName: String = "",
-    var thumbnailLinkUrl: String = "",
     var thumbnailInputDisable: Boolean = true,
     var content: String = "",
     var category: Category = Category.Programming,
@@ -66,12 +68,11 @@ data class CreatePageUiState(
     var imagePopup: Boolean = false
 ) {
     fun reset() = this.copy(
-        id = "",
+        id = 0,
         title = "",
         subtitle = "",
         thumbnail = "",
         thumbnailName = "",
-        thumbnailLinkUrl = "",
         content = "",
         category = Category.Programming,
         tags = mutableListOf(),
@@ -99,10 +100,41 @@ fun CreateScreen() {
     val breakpoint = rememberBreakpoint()
     val scope = rememberCoroutineScope()
     val context = rememberPageContext()
-    var isChecked by remember { mutableStateOf(false) }
+//    var isChecked by remember { mutableStateOf(false) }
+
+    val hasPostIdParam = remember(key1 = context.route){
+        context.route.params.containsKey(POST_ID_PARAM)
+    }
 
     val inject: Koin = get()
     val repository = inject.get<PostRepository>()
+
+    LaunchedEffect(hasPostIdParam){
+        if (hasPostIdParam){
+            val postId = context.route.params[POST_ID_PARAM] ?: ""
+            when(val result = repository.getPostDetail(id = postId.toLong())){
+                is ApiResponse.Success -> {
+                    val response = result.data.data
+                    (document.getElementById(Id.editor) as HTMLTextAreaElement).value = response.content
+                    uiState = uiState.copy(
+                        id = response.id,
+                        title = response.title,
+                        subtitle = response.subtitle,
+                        content = response.content,
+                        category = Category.valueOf(response.category),
+                        buttonText = "Update",
+                    )
+                }
+                is ApiResponse.Error -> {
+                    (document.getElementById(Id.editor) as HTMLTextAreaElement).value = ""
+                    uiState = uiState.reset()
+                }
+                is ApiResponse.Loading -> {
+
+                }
+            }
+        }
+    }
 
     AdminPageLayout {
         Box(
@@ -200,6 +232,7 @@ fun CreateScreen() {
                         )
                         .toAttrs {
                             attr("placeholder", "Title")
+                            attr("value", uiState.title)
                         }
                 )
                 Input(
@@ -214,6 +247,7 @@ fun CreateScreen() {
                         )
                         .toAttrs {
                             attr("placeholder", "Subtitle")
+                            attr("value", uiState.subtitle)
                         }
                 )
                 Dropdown(
@@ -286,45 +320,79 @@ fun CreateScreen() {
                         uiState = uiState.copy(status = Status.DRAFT)
                         if (!uiState.thumbnailInputDisable) {
                             uiState =
-                                uiState.copy(thumbnailLinkUrl = (document.getElementById(Id.thumbnailInput) as HTMLInputElement).value)
-
+                                uiState.copy(thumbnailUrl = (document.getElementById(Id.thumbnailInput) as HTMLInputElement).value)
                         }
                         if (
                             uiState.title.isNotEmpty() &&
                             uiState.subtitle.isNotEmpty() &&
-                            uiState.thumbnail.isNotEmpty() || uiState.thumbnailLinkUrl.isNotEmpty() &&
+                            uiState.thumbnail.isNotEmpty() || uiState.thumbnailUrl.isNotEmpty() &&
                             uiState.content.isNotEmpty()
                         ) {
                             scope.launch {
-                                val result = repository.createPost(
-                                    PostRequest(
-                                        title = uiState.title,
-                                        subtitle = uiState.subtitle,
-                                        content = uiState.content,
-                                        category = uiState.category.name,
-                                        tags = uiState.tags,
-                                        thumbnailName = uiState.thumbnailName,
-                                        thumbnailLinkUrl = uiState.thumbnailLinkUrl,
-                                        status = uiState.status.name
-                                    ),
-                                    if (uiState.thumbnail.isNotEmpty()) {
-                                        base64ToByteArray(uiState.thumbnail)
-                                    } else {
-                                        null
-                                    }
-                                )
+                                if (hasPostIdParam){
+                                    println(uiState.thumbnail)
+                                    val result = repository.updatePost(
+                                        id = uiState.id,
+                                        PostRequest(
+                                            title = uiState.title,
+                                            subtitle = uiState.subtitle,
+                                            content = uiState.content,
+                                            category = uiState.category.name,
+                                            tags = uiState.tags,
+                                            thumbnailName = uiState.thumbnailName,
+                                            thumbnailLinkUrl = uiState.thumbnailUrl,
+                                            status = uiState.status.name
+                                        ),
+                                        if (uiState.thumbnail.isNotEmpty()) {
+                                            base64ToByteArray(uiState.thumbnail)
+                                        } else {
+                                            null
+                                        }
+                                    )
+                                    when (result) {
+                                        is ApiResponse.Success -> {
+                                            context.router.navigateTo(Screen.AdminSuccess.postUpdated())
+                                        }
 
-                                when (result) {
-                                    is ApiResponse.Success -> {
-                                        context.router.navigateTo(Screen.AdminSuccess.route)
-                                    }
+                                        is ApiResponse.Error -> {
+                                            println("Error: ${result.message}")
+                                        }
 
-                                    is ApiResponse.Error -> {
-                                        println("Error: ${result.message}")
+                                        is ApiResponse.Loading -> {
+                                            println("Loading...")
+                                        }
                                     }
+                                }else{
+                                    val result = repository.createPost(
+                                        PostRequest(
+                                            title = uiState.title,
+                                            subtitle = uiState.subtitle,
+                                            content = uiState.content,
+                                            category = uiState.category.name,
+                                            tags = uiState.tags,
+                                            thumbnailName = uiState.thumbnailName,
+                                            thumbnailLinkUrl = uiState.thumbnailUrl,
+                                            status = uiState.status.name
+                                        ),
+                                       if (uiState.thumbnail.isNotEmpty()) {
+                                            base64ToByteArray(uiState.thumbnail)
+                                        } else {
+                                            null
+                                        }
+                                    )
 
-                                    is ApiResponse.Loading -> {
-                                        println("Loading...")
+                                    when (result) {
+                                        is ApiResponse.Success -> {
+                                            context.router.navigateTo(Screen.AdminSuccess.route)
+                                        }
+
+                                        is ApiResponse.Error -> {
+                                            println("Error: ${result.message}")
+                                        }
+
+                                        is ApiResponse.Loading -> {
+                                            println("Loading...")
+                                        }
                                     }
                                 }
                             }
@@ -405,6 +473,7 @@ fun CreateButton(
             .fontFamily(FONT_FAMILY)
             .fontSize(16.px)
             .border(width = 0.px)
+            .cursor(Cursor.Pointer)
             .toAttrs()
     ) {
         SpanText(text = text)

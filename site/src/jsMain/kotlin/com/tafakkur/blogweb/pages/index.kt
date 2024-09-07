@@ -43,6 +43,7 @@ fun HomePage() {
                     title = "Kotlin backend",
                     slug = "kotlin-backend",
                     subtitle = "Kotlin",
+                    content = "",
                     thumbnailImageUrl = "https://i.pinimg.com/736x/3b/fd/25/3bfd258e53765d880b01881eccb2c932.jpg",
                     status = "PUBLISHED",
                     category = Category.Programming.name,
