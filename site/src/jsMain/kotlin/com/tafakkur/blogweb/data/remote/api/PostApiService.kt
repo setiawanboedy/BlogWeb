@@ -84,4 +84,10 @@ class PostApiService(private val client: HttpClient) {
             header("Authorization", "Bearer $token")
         }
     }
+
+    suspend fun getPostDashboard(): HttpResponse{
+        return client.get("${Config.BASE_URL}api/posts/dashboard") {
+            header("Authorization", "Bearer $token")
+        }
+    }
 }

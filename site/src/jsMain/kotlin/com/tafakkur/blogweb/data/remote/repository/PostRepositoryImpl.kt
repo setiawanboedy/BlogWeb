@@ -71,4 +71,17 @@ class PostRepositoryImpl(
         }
     }
 
+    override suspend fun getPostDashboard(): ApiDashboardResponse {
+        return try {
+            val response = postApiService.getPostDashboard()
+            if (response.status.isSuccess()){
+                ApiResponse.Success(response.body())
+            }else{
+                ApiResponse.Error("Error: ${response.bodyAsText()}")
+            }
+        }catch (e: Exception){
+            ApiResponse.Error("Exception: ${e.message}")
+        }
+    }
+
 }
