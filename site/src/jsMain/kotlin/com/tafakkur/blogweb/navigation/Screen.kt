@@ -10,7 +10,7 @@ sealed class Screen(val route: String){
     data object AdminHome : Screen(route = "/admin/")
     data object AdminLogin : Screen(route = "/admin/login")
     data object AdminCreate : Screen(route = "/admin/create"){
-        fun passPostId(id: String) = "/admin/create?${POST_ID_PARAM}=$id"
+        fun passPostId(id: Long) = "/admin/create?${POST_ID_PARAM}=$id"
     }
 
     data object AdminMyPosts : Screen(route = "/admin/my-posts"){

@@ -3,7 +3,6 @@ package com.tafakkur.blogweb.components
 import androidx.compose.runtime.*
 import com.tafakkur.blogweb.dto.PostResponse
 import com.tafakkur.blogweb.models.Category
-import com.tafakkur.blogweb.models.PostWithoutDetails
 import com.tafakkur.blogweb.styles.MainPostPreviewStyle
 import com.tafakkur.blogweb.styles.PostPreviewStyle
 import com.tafakkur.blogweb.util.Constants.FONT_FAMILY

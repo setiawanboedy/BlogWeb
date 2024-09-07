@@ -1,6 +1,7 @@
 package com.tafakkur.blogweb.models
 
 object Constants {
+    const val PAGE = 1
     const val POSTS_PER_PAGE = 8
     const val QUERY_PARAM = "query"
     const val CATEGORY_PARAM = "category"

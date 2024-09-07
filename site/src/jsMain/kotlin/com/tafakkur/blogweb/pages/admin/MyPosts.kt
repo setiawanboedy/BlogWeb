@@ -6,7 +6,9 @@ import com.tafakkur.blogweb.components.PostView
 import com.tafakkur.blogweb.components.SearchBar
 import com.tafakkur.blogweb.core.sealed.ApiResponse
 import com.tafakkur.blogweb.dto.PostResponse
-import com.tafakkur.blogweb.models.PostWithoutDetails
+import com.tafakkur.blogweb.models.Constants.PAGE
+import com.tafakkur.blogweb.models.Constants.POSTS_PER_PAGE
+import com.tafakkur.blogweb.models.Constants.QUERY_PARAM
 import com.tafakkur.blogweb.navigation.Screen
 import com.tafakkur.blogweb.repository.PostRepository
 import com.tafakkur.blogweb.util.Constants.FONT_FAMILY
@@ -47,8 +49,8 @@ import org.w3c.dom.HTMLInputElement
 
 @Page
 @Composable
-fun MyPostsPage(){
-    isUserLoggedIn{
+fun MyPostsPage() {
+    isUserLoggedIn {
         MyPostsScreen()
     }
 }
@@ -64,24 +66,54 @@ fun MyPostsScreen() {
     var showMoreVisibility by remember { mutableStateOf(false) }
     val selectedPosts = remember { mutableStateListOf<Long>() }
 
+    var page by remember { mutableStateOf(0) }
+
+    val hasParams = remember(key1 = context.route) { context.route.params.containsKey(QUERY_PARAM) }
+    val query = remember(key1 = context.route) { context.route.params[QUERY_PARAM] ?: "" }
+
     val inject: Koin = get()
     val repository = inject.get<PostRepository>()
 
-    LaunchedEffect(context.route){
-        val filter: MutableMap<String, Any> = mutableMapOf("page" to 0, "size" to 1)
-        scope.launch {
-           val result = repository.getAllPosts(filter)
+    LaunchedEffect(context.route) {
+        page = 0
+        if (hasParams) {
+            val search = query.replace("%20", " ")
 
-            when(result){
-                is ApiResponse.Success -> {
-                    myPosts.clear()
-                    myPosts.addAll(result.data.data)
+            scope.launch {
+                val filter: MutableMap<String, Any> = mutableMapOf("title" to search)
+                when (val result = repository.getAllPosts(filter)) {
+                    is ApiResponse.Success -> {
+                        myPosts.clear()
+                        myPosts.addAll(result.data.data)
+                    }
+
+                    is ApiResponse.Error -> {
+                        println(result.message)
+                    }
+
+                    is ApiResponse.Loading -> {
+
+                    }
                 }
-                is ApiResponse.Error -> {
+            }
+        } else {
+            scope.launch {
+                val filter: MutableMap<String, Any> = mutableMapOf("page" to page, "size" to POSTS_PER_PAGE)
+                when (val result = repository.getAllPosts(filter)) {
+                    is ApiResponse.Success -> {
+                        myPosts.clear()
+                        myPosts.addAll(result.data.data)
+                        page += PAGE
+                        showMoreVisibility = result.data.data.size >= POSTS_PER_PAGE
+                    }
 
-                }
-                is ApiResponse.Loading -> {
+                    is ApiResponse.Error -> {
 
+                    }
+
+                    is ApiResponse.Loading -> {
+
+                    }
                 }
             }
         }
@@ -111,14 +143,15 @@ fun MyPostsScreen() {
                     )
                         .transition(CSSTransition(property = TransitionProperty.All, duration = 200.ms)),
                     onSearchIconClick = {
+                    },
+                    onEnterClick = {
                         val searchInput = (document.getElementById(Id.adminSearchBar) as HTMLInputElement).value
                         if (searchInput.isNotEmpty()) {
                             context.router.navigateTo(Screen.AdminMyPosts.searchByTitle(query = searchInput))
                         } else {
                             context.router.navigateTo(Screen.AdminMyPosts.route)
                         }
-                    },
-                    onEnterClick = {}
+                    }
                 )
 
             }
@@ -174,15 +207,15 @@ fun MyPostsScreen() {
                         .visibility(
                             if (selectedPosts.isNotEmpty()) Visibility.Visible else Visibility.Hidden
                         )
-                        .onClick {  }
+                        .onClick { }
                         .toAttrs()
-                ){
+                ) {
                     SpanText(text = "Delete")
                 }
             }
             PostView(
                 breakpoint = breakpoint,
-                posts =  myPosts,
+                posts = myPosts,
                 selectableMode = selectableMode,
                 onSelect = {
                     selectedPosts.add(it)
@@ -194,9 +227,53 @@ fun MyPostsScreen() {
                 },
                 showMoreVisibility = showMoreVisibility,
                 onShowMore = {
+                    scope.launch {
+                        if (hasParams) {
+                            val search = query.replace("%20", " ")
+                            val filter: MutableMap<String, Any> =
+                                mutableMapOf("title" to search)
+                            when (val result = repository.getAllPosts(filter)) {
+                                is ApiResponse.Success -> {
+                                    if (result.data.data.isNotEmpty()) {
+                                        myPosts.addAll(result.data.data)
+                                    } else {
+                                        showMoreVisibility = false
+                                    }
+                                }
 
+                                is ApiResponse.Error -> {
+                                    println(result.message)
+                                }
+
+                                is ApiResponse.Loading -> {
+
+                                }
+                            }
+                        } else {
+                            val filter: MutableMap<String, Any> = mutableMapOf("page" to page, "size" to POSTS_PER_PAGE)
+                            when (val result = repository.getAllPosts(filter)) {
+                                is ApiResponse.Success -> {
+                                    if (result.data.data.isNotEmpty()) {
+                                        myPosts.addAll(result.data.data)
+                                        page += PAGE
+                                        showMoreVisibility = result.data.data.size >= POSTS_PER_PAGE
+                                    } else {
+                                        showMoreVisibility = false
+                                    }
+                                }
+
+                                is ApiResponse.Error -> {
+                                    println(result.message)
+                                }
+
+                                is ApiResponse.Loading -> {
+
+                                }
+                            }
+                        }
+                    }
                 },
-                onClick = {}
+                onClick = { context.router.navigateTo(Screen.AdminCreate.passPostId(id = it)) }
             )
         }
     }

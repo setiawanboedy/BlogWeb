@@ -47,7 +47,9 @@ class PostApiService(private val client: HttpClient) {
 
     suspend fun getAllPosts(filter: MutableMap<String, Any>): HttpResponse{
         return client.get("${Config.BASE_URL}api/posts/list") {
-            contentType(ContentType.Application.Json)
+            filter.entries.forEach { param ->
+                parameter(param.key, param.value)
+            }
             header("Authorization", "Bearer $token")
         }
     }
