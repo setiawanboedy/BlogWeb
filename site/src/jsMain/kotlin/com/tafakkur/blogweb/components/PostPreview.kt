@@ -1,11 +1,14 @@
 package com.tafakkur.blogweb.components
 
 import androidx.compose.runtime.*
-import com.tafakkur.blogweb.models.PostWithoutDetails
+import com.tafakkur.blogweb.dto.PostResponse
+import com.tafakkur.blogweb.models.Category
 import com.tafakkur.blogweb.styles.MainPostPreviewStyle
 import com.tafakkur.blogweb.styles.PostPreviewStyle
 import com.tafakkur.blogweb.util.Constants.FONT_FAMILY
 import com.tafakkur.blogweb.util.JsTheme
+import com.tafakkur.blogweb.util.checkUrlThumbnailImage
+import com.tafakkur.blogweb.util.toFormattedDateTime
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.foundation.layout.Arrangement
 import com.varabyte.kobweb.compose.foundation.layout.Column
@@ -22,7 +25,7 @@ import org.jetbrains.compose.web.dom.CheckboxInput
 @Composable
 fun PostPreview(
     modifier: Modifier = Modifier,
-    post: PostWithoutDetails,
+    post: PostResponse,
     selectableMode: Boolean = false,
     darkTheme: Boolean = false,
     vertical: Boolean = true,
@@ -118,7 +121,7 @@ fun PostPreview(
 
 @Composable
 fun PostContent(
-    post: PostWithoutDetails,
+    post: PostResponse,
     selectableMode: Boolean,
     darkTheme: Boolean,
     vertical: Boolean,
@@ -133,7 +136,7 @@ fun PostContent(
             .height(size = thumbnailHeight)
             .fillMaxWidth()
             .objectFit(ObjectFit.Cover),
-        src = post.thumbnail,
+        src = checkUrlThumbnailImage(post.thumbnailImageUrl),
         alt = "Post Thumbnail Image"
     )
 
@@ -153,7 +156,7 @@ fun PostContent(
                 .color(
                     if (darkTheme) JsTheme.HalfWhite.rgb else JsTheme.HalfBlack.rgb
                 ),
-            text = post.createdAt
+            text = post.createdAt.toFormattedDateTime()
         )
         SpanText(
             modifier = Modifier
@@ -197,7 +200,7 @@ fun PostContent(
             verticalAlignment = Alignment.CenterVertically
         ) {
             CategoryChip(
-                category = post.category, darkTheme = darkTheme
+                category = Category.valueOf(post.category), darkTheme = darkTheme
             )
             if (selectableMode) {
                 CheckboxInput(

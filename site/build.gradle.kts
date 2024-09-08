@@ -46,10 +46,15 @@ kobweb {
 
 kotlin {
     configAsKobwebApplication("blogweb", includeServer = true)
-
+    js(IR) {
+        browser {
+            binaries.executable()
+        }
+    }
     sourceSets {
         commonMain.dependencies {
             implementation(compose.runtime)
+            implementation(libs.kotlinx.serialization)
         }
 
         jsMain.dependencies {
@@ -59,6 +64,13 @@ kotlin {
             implementation(libs.silk.icons.fa)
             implementation(libs.silk.icons.mdi)
             implementation(libs.kotlinx.serialization)
+            implementation(libs.kobweb.ktor.core)
+            implementation(libs.kobweb.ktor.json)
+            implementation(libs.kobweb.ktor.serialize)
+            implementation(libs.kobweb.ktor.negotiation)
+            implementation(libs.kobweb.ktor.js)
+            implementation(libs.kobweb.ktor.logging)
+            implementation(libs.kobweb.koin.core)
             // implementation(libs.kobwebx.markdown)
 
         }

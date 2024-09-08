@@ -1,8 +1,13 @@
 package com.tafakkur.blogweb.util
 
+import com.tafakkur.blogweb.core.utils.Constants.IMAGE_BASE_URL
 import com.tafakkur.blogweb.models.EditorControl
 import kotlinx.browser.document
 import org.w3c.dom.HTMLTextAreaElement
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
+import kotlin.js.Date
+
 
 fun applyControlStyle(
     editorControl: EditorControl,
@@ -101,4 +106,31 @@ fun parseSwitchText(posts: List<Long>): String {
 fun validateEmail(email: String): Boolean {
     val regex = "^[A-Za-z](.*)(@)(.+)(\\.)(.+)"
     return regex.toRegex().matches(email)
+}
+
+fun isTokenExpired(expiresIn: String?): Boolean {
+
+    if (expiresIn == null){
+        return true
+    }
+    val expirationTime = Date(expiresIn).getTime()
+    val currentTime = Date.now()
+
+    return currentTime > expirationTime
+}
+
+@OptIn(ExperimentalEncodingApi::class)
+fun base64ToByteArray(dataUrl: String): ByteArray {
+    val base64Data = dataUrl.substringAfter("base64,")
+
+    return Base64.decode(base64Data)
+}
+
+fun checkUrlThumbnailImage(url: String): String {
+    val isHaveHttp = url.contains("http")
+    var urlImage = url
+    if (!isHaveHttp){
+        urlImage = "$IMAGE_BASE_URL$url"
+    }
+    return urlImage
 }

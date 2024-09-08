@@ -3,6 +3,7 @@ package com.tafakkur.blogweb.sections
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import com.tafakkur.blogweb.components.PostPreview
+import com.tafakkur.blogweb.dto.PostResponse
 import com.tafakkur.blogweb.models.PostWithoutDetails
 import com.tafakkur.blogweb.util.Constants.PAGE_WIDTH
 import com.tafakkur.blogweb.util.JsTheme
@@ -22,7 +23,7 @@ import org.jetbrains.compose.web.css.px
 @Composable
 fun MainSection(
     breakpoint: Breakpoint,
-    posts: List<PostWithoutDetails>,
+    posts: List<PostResponse>,
     onClick: (Long) -> Unit
 ) {
 
@@ -50,12 +51,9 @@ fun MainSection(
 @Composable
 fun MainPosts(
     breakpoint: Breakpoint,
-    posts: List<PostWithoutDetails>,
+    posts: List<PostResponse>,
     onClick: (Long) -> Unit
 ) {
-    LaunchedEffect(Unit) {
-        println("Logging posts: ${posts.first()}")
-    }
     Row(
         modifier = Modifier
             .fillMaxWidth(
@@ -71,7 +69,7 @@ fun MainPosts(
                     post = posts.first(),
                     darkTheme = true,
                     thumbnailHeight = 640.px,
-                    onClick = { }
+                    onClick = { onClick(posts.first().id) }
                 )
 
                 Column(

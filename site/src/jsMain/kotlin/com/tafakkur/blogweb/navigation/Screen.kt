@@ -7,10 +7,10 @@ import com.tafakkur.blogweb.models.Constants.QUERY_PARAM
 import com.tafakkur.blogweb.models.Constants.UPDATED_PARAM
 
 sealed class Screen(val route: String){
-    data object AdminHome : Screen(route = "/admin")
+    data object AdminHome : Screen(route = "/admin/")
     data object AdminLogin : Screen(route = "/admin/login")
     data object AdminCreate : Screen(route = "/admin/create"){
-        fun passPostId(id: String) = "/admin/create?${POST_ID_PARAM}=$id"
+        fun passPostId(id: Long) = "/admin/create?${POST_ID_PARAM}=$id"
     }
 
     data object AdminMyPosts : Screen(route = "/admin/my-posts"){
@@ -28,7 +28,7 @@ sealed class Screen(val route: String){
         fun searchByTitle(query: String) = "/search/query?${QUERY_PARAM}=$query"
     }
 
-    data object PostPage : Screen(route = "/posts/post"){
-        fun getPosts(id: Long) = "/posts/post?${POST_ID_PARAM}=$id"
+    data object PostPage : Screen(route = "/post/detail"){
+        fun getPosts(id: Long) = "/post/detail?${POST_ID_PARAM}=$id"
     }
 }

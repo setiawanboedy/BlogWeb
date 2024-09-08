@@ -7,6 +7,7 @@ import com.tafakkur.blogweb.navigation.Screen
 import com.tafakkur.blogweb.util.Constants.FONT_FAMILY
 import com.tafakkur.blogweb.util.JsTheme
 import com.tafakkur.blogweb.util.Res
+import com.tafakkur.blogweb.util.isUserLoggedIn
 import com.varabyte.kobweb.compose.foundation.layout.Arrangement
 import com.varabyte.kobweb.compose.foundation.layout.Column
 import com.varabyte.kobweb.compose.ui.Alignment
@@ -22,6 +23,13 @@ import org.jetbrains.compose.web.css.px
 @Page
 @Composable
 fun SuccessPage(){
+    isUserLoggedIn{
+        SuccessScreen()
+    }
+}
+
+@Composable
+fun SuccessScreen(){
     val context = rememberPageContext()
     val postUpdate = context.route.params.containsKey(UPDATED_PARAM)
 
