@@ -2,6 +2,8 @@ package com.tafakkur.blogweb.components
 
 import androidx.compose.runtime.*
 import com.tafakkur.blogweb.navigation.Screen
+import com.tafakkur.blogweb.repository.AuthRepository
+import com.tafakkur.blogweb.repository.PostRepository
 import com.tafakkur.blogweb.styles.NavigationItemStyle
 import com.tafakkur.blogweb.util.Constants.COLLAPSED_PANEL_HEIGHT
 import com.tafakkur.blogweb.util.Constants.FONT_FAMILY
@@ -36,6 +38,8 @@ import com.varabyte.kobweb.silk.theme.breakpoint.rememberBreakpoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.web.css.*
+import org.koin.core.Koin
+import org.koin.core.context.GlobalContext.get
 
 @Composable
 fun SidePanel(onMenuClick: () -> Unit){
@@ -223,8 +227,10 @@ fun NavigationItems(){
         title = "Logout",
         icon = Res.PathIcon.logout,
         onClick = {
-//            logout()
+            logout()
+            context.router.navigateTo(Screen.AdminLogin.route)
         }
+
     )
 }
 
@@ -290,4 +296,11 @@ private fun VectorIcon(
             attr(attr = "stroke-linejoin", value = "round")
         }
     }
+}
+
+fun logout(){
+    val inject: Koin = get()
+    val repository = inject.get<AuthRepository>()
+    repository.clearToken()
+
 }

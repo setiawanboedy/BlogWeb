@@ -47,7 +47,6 @@ fun LoginPage() {
     val expiresAt = remember { storage.getItem(EXPIRES_AT) }
     LaunchedEffect(Unit) {
         val isExpired = isTokenExpired(expiresAt)
-        println(isExpired)
         if (!isExpired) {
             context.router.navigateTo(Screen.AdminHome.route)
         }

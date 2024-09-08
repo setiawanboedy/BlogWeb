@@ -54,9 +54,6 @@ fun MainPosts(
     posts: List<PostResponse>,
     onClick: (Long) -> Unit
 ) {
-    LaunchedEffect(Unit) {
-        println("Logging posts: ${posts.first()}")
-    }
     Row(
         modifier = Modifier
             .fillMaxWidth(

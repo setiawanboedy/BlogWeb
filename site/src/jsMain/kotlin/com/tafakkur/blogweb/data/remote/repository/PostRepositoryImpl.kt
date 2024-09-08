@@ -71,6 +71,32 @@ class PostRepositoryImpl(
         }
     }
 
+    override suspend fun getAllFrontPosts(filter: MutableMap<String, Any>?): ApiPostsResponse {
+        return try {
+            val response = postApiService.getAllFrontPosts(filter)
+            if (response.status.isSuccess()){
+                ApiResponse.Success(response.body())
+            }else{
+                ApiResponse.Error("Error: ${response.bodyAsText()}")
+            }
+        }catch (e: Exception){
+            ApiResponse.Error("Exception: ${e.message}")
+        }
+    }
+
+    override suspend fun getFrontPostDetail(id: Long): ApiPostResponse {
+        return try {
+            val response = postApiService.getFrontPostDetail(id)
+            if (response.status.isSuccess()){
+                ApiResponse.Success(response.body())
+            }else{
+                ApiResponse.Error("Error: ${response.bodyAsText()}")
+            }
+        }catch (e: Exception){
+            ApiResponse.Error("Exception: ${e.message}")
+        }
+    }
+
     override suspend fun getPostDashboard(): ApiDashboardResponse {
         return try {
             val response = postApiService.getPostDashboard()

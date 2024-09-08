@@ -33,18 +33,19 @@ fun HomePage() {
     val latestPosts = remember { mutableStateListOf<PostResponse>() }
     val sponsoredPosts = remember { mutableStateListOf<PostResponse>() }
     val popularPosts = remember { mutableStateListOf<PostResponse>() }
-    var latestPostsToSkip by remember { mutableStateOf(0) }
-    var popularPostsToSkip by remember { mutableStateOf(0) }
+//    var latestPostsToSkip by remember { mutableStateOf(0) }
+//    var popularPostsToSkip by remember { mutableStateOf(0) }
     var showMoreLatest by remember { mutableStateOf(false) }
     var showMorePopular by remember { mutableStateOf(false) }
 
     val inject: Koin = get()
     val repository = inject.get<PostRepository>()
 
+
     LaunchedEffect(context.route) {
         scope.launch {
             //  main
-            when(val result = repository.getAllPosts(mutableMapOf("main" to true))){
+            when(val result = repository.getAllFrontPosts(mutableMapOf("main" to true))){
                 is ApiResponse.Success -> {
                     if (result.data.data.isNotEmpty()){
                         mainPosts.clear()
@@ -58,7 +59,7 @@ fun HomePage() {
             }
 
             //  latestPost
-            when(val result = repository.getAllPosts(mutableMapOf("page" to 0, "size" to POSTS_PER_PAGE))){
+            when(val result = repository.getAllFrontPosts(mutableMapOf("page" to 0, "size" to POSTS_PER_PAGE))){
                 is ApiResponse.Success -> {
                     if (result.data.data.isNotEmpty()){
                         latestPosts.clear()
@@ -72,7 +73,7 @@ fun HomePage() {
             }
 
             //  popular
-            when(val result = repository.getAllPosts(mutableMapOf("popular" to true))){
+            when(val result = repository.getAllFrontPosts(mutableMapOf("popular" to true))){
                 is ApiResponse.Success -> {
                     if (result.data.data.isNotEmpty()){
                         popularPosts.clear()
@@ -86,7 +87,7 @@ fun HomePage() {
             }
 
             //  sponsored
-            when(val result = repository.getAllPosts(mutableMapOf("sponsored" to true))){
+            when(val result = repository.getAllFrontPosts(mutableMapOf("sponsored" to true))){
                 is ApiResponse.Success -> {
                     if (result.data.data.isNotEmpty()){
                         sponsoredPosts.clear()

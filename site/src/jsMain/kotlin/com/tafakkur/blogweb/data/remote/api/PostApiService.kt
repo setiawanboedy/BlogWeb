@@ -39,7 +39,7 @@ class PostApiService(private val client: HttpClient) {
 
                 if (thumbnailImage != null) {
                     append("thumbnailImageUrl", thumbnailImage, Headers.build {
-                        append(HttpHeaders.ContentDisposition, "filename=\"${postRequest.thumbnailName}.png\"")
+                        append(HttpHeaders.ContentDisposition, "filename=\"${postRequest.thumbnailName}\"")
                     })
                 }
             }
@@ -67,7 +67,7 @@ class PostApiService(private val client: HttpClient) {
 
                 if (thumbnailImage != null) {
                     append("thumbnailImageUrl", thumbnailImage, Headers.build {
-                        append(HttpHeaders.ContentDisposition, "filename=\"${postRequest.thumbnailName}.png\"")
+                        append(HttpHeaders.ContentDisposition, "filename=\"${postRequest.thumbnailName}\"")
                     })
                 }
             }
@@ -86,9 +86,23 @@ class PostApiService(private val client: HttpClient) {
         }
     }
 
+    suspend fun getAllFrontPosts(filter: MutableMap<String, Any>?): HttpResponse{
+        return client.get("${Config.BASE_URL}api/front/posts/list") {
+
+            filter?.entries?.forEach { param ->
+                parameter(param.key, param.value)
+            }
+        }
+    }
+
     suspend fun getPostDetail(id: Long): HttpResponse{
         return client.get("${Config.BASE_URL}api/posts/$id/detail") {
             header("Authorization", "Bearer $token")
+        }
+    }
+
+    suspend fun getFrontPostDetail(id: Long): HttpResponse{
+        return client.get("${Config.BASE_URL}api/front/posts/$id/detail") {
         }
     }
 

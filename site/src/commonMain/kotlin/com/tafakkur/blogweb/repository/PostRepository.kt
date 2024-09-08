@@ -12,5 +12,8 @@ interface PostRepository {
     suspend fun getAllPosts(filter: MutableMap<String, Any>? = mutableMapOf()): ApiPostsResponse
     suspend fun getPostDetail(id: Long): ApiPostResponse
 
+    suspend fun getAllFrontPosts(filter: MutableMap<String, Any>? = mutableMapOf()): ApiPostsResponse
+    suspend fun getFrontPostDetail(id: Long): ApiPostResponse
+
     suspend fun getPostDashboard(): ApiDashboardResponse
 }

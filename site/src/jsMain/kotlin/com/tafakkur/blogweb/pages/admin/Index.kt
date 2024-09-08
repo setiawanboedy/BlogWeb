@@ -20,6 +20,7 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.core.Page
+import com.varabyte.kobweb.core.rememberPageContext
 import com.varabyte.kobweb.silk.components.icons.fa.FaCode
 import com.varabyte.kobweb.silk.components.icons.fa.FaLaptop
 import com.varabyte.kobweb.silk.components.icons.fa.FaPaintbrush
@@ -46,13 +47,14 @@ fun HomePage() {
 fun HomeScreen() {
     val breakpoint = rememberBreakpoint()
     val scope = rememberCoroutineScope()
+    val context = rememberPageContext()
 
     var dashboard by remember { mutableStateOf(DashboardResponse()) }
 
     val inject: Koin = get()
     val repository = inject.get<PostRepository>()
 
-    LaunchedEffect(Unit){
+    LaunchedEffect(key1 = context.route){
         scope.launch {
             when(val result = repository.getPostDashboard()){
                 is ApiResponse.Success -> {
