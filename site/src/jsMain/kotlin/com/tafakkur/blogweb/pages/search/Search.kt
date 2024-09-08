@@ -10,6 +10,7 @@ import com.tafakkur.blogweb.models.Category
 import com.tafakkur.blogweb.models.Constants.CATEGORY_PARAM
 import com.tafakkur.blogweb.models.Constants.PAGE
 import com.tafakkur.blogweb.models.Constants.POSTS_PER_PAGE
+import com.tafakkur.blogweb.models.Constants.QUERY_PARAM
 import com.tafakkur.blogweb.navigation.Screen
 import com.tafakkur.blogweb.repository.PostRepository
 import com.tafakkur.blogweb.sections.FooterSection
@@ -57,14 +58,14 @@ fun SearchPostPage(){
     }
 
     val hasQueryParam = remember(key1 = context.route) {
-        context.route.params.containsKey(CATEGORY_PARAM)
+        context.route.params.containsKey(QUERY_PARAM)
     }
 
     val value = remember(key1 = context.route) {
         if (hasCategoryParam){
             context.route.params.getValue(CATEGORY_PARAM)
         }else if (hasQueryParam){
-            context.route.params.getValue(CATEGORY_PARAM)
+            context.route.params.getValue(QUERY_PARAM)
         }else{
             ""
         }
@@ -77,6 +78,7 @@ fun SearchPostPage(){
         (document.getElementById(Id.adminSearchBar) as HTMLInputElement).value = ""
         showMoreVisibility = false
         page = 0
+        println(hasCategoryParam)
         if (hasCategoryParam){
             scope.launch {
                 val category = kotlin.runCatching { Category.valueOf(value) }.getOrElse { Category.Programming }
@@ -96,6 +98,7 @@ fun SearchPostPage(){
         }else if (hasQueryParam){
             (document.getElementById(Id.adminSearchBar) as HTMLInputElement).value = value
             val filter: MutableMap<String, Any> = mutableMapOf("title" to value)
+
             when (val result = repository.getAllFrontPosts(filter)) {
                 is ApiResponse.Success -> {
                     isSuccess = true
@@ -140,6 +143,7 @@ fun SearchPostPage(){
          )
 
         if (isSuccess){
+
             if (hasCategoryParam){
                 SpanText(
                     modifier = Modifier

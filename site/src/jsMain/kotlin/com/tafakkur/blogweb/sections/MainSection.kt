@@ -69,7 +69,7 @@ fun MainPosts(
                     post = posts.first(),
                     darkTheme = true,
                     thumbnailHeight = 640.px,
-                    onClick = { }
+                    onClick = { onClick(posts.first().id) }
                 )
 
                 Column(
