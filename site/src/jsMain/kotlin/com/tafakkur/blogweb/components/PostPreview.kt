@@ -8,6 +8,7 @@ import com.tafakkur.blogweb.styles.PostPreviewStyle
 import com.tafakkur.blogweb.util.Constants.FONT_FAMILY
 import com.tafakkur.blogweb.util.JsTheme
 import com.tafakkur.blogweb.util.checkUrlThumbnailImage
+import com.tafakkur.blogweb.util.toFormattedDateTime
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.foundation.layout.Arrangement
 import com.varabyte.kobweb.compose.foundation.layout.Column
@@ -155,7 +156,7 @@ fun PostContent(
                 .color(
                     if (darkTheme) JsTheme.HalfWhite.rgb else JsTheme.HalfBlack.rgb
                 ),
-            text = post.createdAt
+            text = post.createdAt.toFormattedDateTime()
         )
         SpanText(
             modifier = Modifier

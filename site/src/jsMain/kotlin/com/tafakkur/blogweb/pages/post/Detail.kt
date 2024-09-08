@@ -12,10 +12,8 @@ import com.tafakkur.blogweb.models.Constants.SHOW_SECTIONS_PARAM
 import com.tafakkur.blogweb.repository.PostRepository
 import com.tafakkur.blogweb.sections.FooterSection
 import com.tafakkur.blogweb.sections.HeaderSection
+import com.tafakkur.blogweb.util.*
 import com.tafakkur.blogweb.util.Constants.FONT_FAMILY
-import com.tafakkur.blogweb.util.Id
-import com.tafakkur.blogweb.util.JsTheme
-import com.tafakkur.blogweb.util.Res
 import com.varabyte.kobweb.compose.css.FontWeight
 import com.varabyte.kobweb.compose.css.ObjectFit
 import com.varabyte.kobweb.compose.css.Overflow
@@ -148,12 +146,20 @@ fun PostContent(
     }
     Column(
         modifier = Modifier
+            .margin(top = 50.px, bottom = 200.px)
+            .padding(leftRight = 24.px)
             .fillMaxWidth()
-            .color(JsTheme.HalfBlack.rgb)
-            .fontFamily(FONT_FAMILY)
-            .fontSize(14.px),
+            .maxWidth(800.px),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        SpanText(
+            modifier = Modifier
+                .fillMaxWidth()
+                .color(JsTheme.HalfBlack.rgb)
+                .fontFamily(FONT_FAMILY)
+                .fontSize(14.px),
+            text = post.createdAt.toFormattedDateTime()
+        )
         SpanText(
             modifier = Modifier
                 .fillMaxWidth()
@@ -182,7 +188,7 @@ fun PostContent(
                     else if (breakpoint <= Breakpoint.MD) 400.px
                     else 400.px
                 ),
-            src = post.thumbnailImageUrl
+            src = checkUrlThumbnailImage(post.thumbnailImageUrl)
         )
         Div(
             attrs = Modifier

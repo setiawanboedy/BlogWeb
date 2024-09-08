@@ -211,9 +211,10 @@ fun SearchPostPage(){
                     )
                 }
             }
-        }else{
-            LoadingIndicator()
         }
+//        else{
+//            LoadingIndicator()
+//        }
         FooterSection()
     }
 
