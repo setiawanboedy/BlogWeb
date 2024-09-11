@@ -7,6 +7,7 @@ WORKDIR /app
 # Copy seluruh proyek ke dalam container
 COPY . .
 
+RUN chmod +x ./gradlew
 # Bangun proyek Kobweb
 RUN ./gradlew build
 
