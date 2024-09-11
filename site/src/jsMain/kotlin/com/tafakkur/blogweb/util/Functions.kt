@@ -1,6 +1,6 @@
 package com.tafakkur.blogweb.util
 
-import com.tafakkur.blogweb.core.utils.Constants.IMAGE_BASE_URL
+import com.tafakkur.blogweb.config.Config.IMAGE_BASE_URL
 import com.tafakkur.blogweb.models.EditorControl
 import kotlinx.browser.document
 import org.w3c.dom.HTMLTextAreaElement
