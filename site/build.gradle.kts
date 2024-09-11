@@ -74,6 +74,3 @@ kotlin {
     }
 }
 
-tasks.getByName<Test>("test"){
-    enabled = false
-}
