@@ -1,4 +1,3 @@
-import com.varabyte.kobweb.gradle.application.extensions.AppBlock.LegacyRouteRedirectStrategy
 import com.varabyte.kobweb.gradle.application.util.configAsKobwebApplication
 import kotlinx.html.link
 import kotlinx.html.script
@@ -72,8 +71,4 @@ kotlin {
             implementation(libs.kotlinx.serialization)
         }
     }
-}
-
-tasks.kobwebCleanSite{
-    enabled =false
 }
