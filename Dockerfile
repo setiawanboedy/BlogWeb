@@ -1,14 +1,10 @@
 #-----------------------------------------------------------------------------
-# Variables shared across multiple stages (they need to be explicitly opted
-# into each stage by being declaring there too, but their values need only be
-# specified once).
+# Variables shared across multiple stages
 ARG KOBWEB_APP_ROOT="site"
 
 #-----------------------------------------------------------------------------
-# Create an intermediate stage which builds and exports our site. In the
-# final stage, we'll only extract what we need from this stage, saving a lot
-# of space.
-FROM openjdk:11-jdk as export
+# Create an intermediate stage that builds and exports the site.
+FROM openjdk:17-jdk-slim as export
 
 ENV KOBWEB_CLI_VERSION=0.9.12
 ARG KOBWEB_APP_ROOT
@@ -18,8 +14,7 @@ ARG KOBWEB_APP_ROOT
 COPY . /project
 
 # Update and install required OS packages to continue
-# Note: Playwright is a system for running browsers, and here we use it to
-# install Chromium.
+# We install node.js and Playwright dependencies, but these can be removed if not needed
 RUN apt-get update \
     && apt-get install -y curl gnupg unzip wget \
     && curl -sL https://deb.nodesource.com/setup_19.x | bash - \
@@ -36,21 +31,24 @@ ENV PATH="/kobweb-${KOBWEB_CLI_VERSION}/bin:${PATH}"
 
 WORKDIR /project/${KOBWEB_APP_ROOT}
 
-# Decrease Gradle memory usage to avoid OOM situations in tight environments
-# (many free Cloud tiers only give you 512M of RAM). The following amount
-# should be more than enough to build and export our site.
+# Decrease Gradle memory usage to avoid OOM situations
 RUN mkdir ~/.gradle && \
     echo "org.gradle.jvmargs=-Xmx256m" >> ~/.gradle/gradle.properties
 
+# Export the Kobweb project (this builds the project and prepares it for deployment)
 RUN kobweb export --notty
 
 #-----------------------------------------------------------------------------
-# Create the final stage, which contains just enough bits to run the Kobweb
-# server.
-FROM openjdk:11-jre-slim as run
+# Create the final stage, which contains just enough bits to run the Kobweb server.
+FROM openjdk:17-jre-slim as run
 
 ARG KOBWEB_APP_ROOT
 
+# Copy the exported project from the build stage
 COPY --from=export /project/${KOBWEB_APP_ROOT}/.kobweb .kobweb
 
-ENTRYPOINT .kobweb/server/start.sh
+# Expose the port (adjust if necessary)
+EXPOSE 8080
+
+# Start the Kobweb server using the exported files
+ENTRYPOINT ["/bin/bash", ".kobweb/server/start.sh"]
