@@ -1,34 +1,54 @@
 #-----------------------------------------------------------------------------
+# Variables shared across multiple stages
+ARG KOBWEB_APP_ROOT="site"
+
+#-----------------------------------------------------------------------------
 # Create an intermediate stage that builds and exports the site.
 FROM openjdk:17-jdk-slim as export
 
-# Set up environment and copy project files
-WORKDIR /project
-COPY . .
+ENV KOBWEB_CLI_VERSION=0.9.12
+ARG KOBWEB_APP_ROOT
 
-# Install dependencies (e.g., Node.js for Kobweb export)
-RUN apt-get update && apt-get install -y curl gnupg unzip wget nodejs
+# Copy the project code to an arbitrary subdir so we can install stuff in the
+# Docker container root without worrying about clobbering project files.
+COPY . /project
 
-# Fetch and install Kobweb CLI
-RUN wget https://github.com/varabyte/kobweb-cli/releases/download/v0.9.12/kobweb-0.9.12.zip \
-    && unzip kobweb-0.9.12.zip && rm kobweb-0.9.12.zip
+# Update and install required OS packages to continue
+# We install node.js and Playwright dependencies, but these can be removed if not needed
+RUN apt-get update \
+    && apt-get install -y curl gnupg unzip wget \
+    && curl -sL https://deb.nodesource.com/setup_19.x | bash - \
+    && apt-get install -y nodejs \
+    && npm init -y \
+    && npx playwright install --with-deps chromium
 
-ENV PATH="/kobweb-0.9.12/bin:${PATH}"
+# Fetch the latest version of the Kobweb CLI
+RUN wget https://github.com/varabyte/kobweb-cli/releases/download/v${KOBWEB_CLI_VERSION}/kobweb-${KOBWEB_CLI_VERSION}.zip \
+    && unzip kobweb-${KOBWEB_CLI_VERSION}.zip \
+    && rm kobweb-${KOBWEB_CLI_VERSION}.zip
 
-# Decrease Gradle memory usage
-RUN mkdir ~/.gradle && echo "org.gradle.jvmargs=-Xmx256m" >> ~/.gradle/gradle.properties
+ENV PATH="/kobweb-${KOBWEB_CLI_VERSION}/bin:${PATH}"
 
-# Export the Kobweb site
-WORKDIR /project/site
+WORKDIR /project/${KOBWEB_APP_ROOT}
+
+# Decrease Gradle memory usage to avoid OOM situations
+#RUN #mkdir ~/.gradle && \
+##    echo "org.gradle.jvmargs=-Xmx256m" >> ~/.gradle/gradle.properties
+
+# Export the Kobweb project (this builds the project and prepares it for deployment)
 RUN kobweb export --notty
 
 #-----------------------------------------------------------------------------
-# Final stage: run the Kobweb server with the exported files.
-FROM openjdk:17-jdk-slim
+# Create the final stage, which contains just enough bits to run the Kobweb server.
+FROM openjdk:17-jdk-slim as run
 
-# Copy the exported site from the previous stage
-COPY --from=export /project/site/.kobweb .kobweb
+ARG KOBWEB_APP_ROOT
 
-# Expose port and run server
+# Copy the exported project from the build stage
+COPY --from=export /project/${KOBWEB_APP_ROOT}/.kobweb .kobweb
+
+# Expose the port (adjust if necessary)
 EXPOSE 8080
-CMD ["/bin/bash", ".kobweb/server/start.sh"]
+
+# Start the Kobweb server using the exported files
+ENTRYPOINT ["/bin/bash", ".kobweb/server/start.sh"]
