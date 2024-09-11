@@ -45,11 +45,12 @@ options:
   logging: CLOUD_LOGGING_ONLY
 substitutions:
   _PLATFORM: managed
-  _SERVICE_NAME: blog-api
+  _SERVICE_NAME: BlogWeb
   _DEPLOY_REGION: us-central1
   _TRIGGER_ID: dd6392b1-bd36-437e-9580-d4fe041d41c2
   _AR_HOSTNAME: us-central1-docker.pkg.dev
 tags:
   - gcp-cloud-build-deploy-cloud-run
   - gcp-cloud-build-deploy-cloud-run-managed
-  - blog-web
+  - BlogWeb
+
