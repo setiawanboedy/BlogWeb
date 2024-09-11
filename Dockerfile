@@ -24,7 +24,7 @@ RUN kobweb export --notty
 
 #-----------------------------------------------------------------------------
 # Final stage: run the Kobweb server with the exported files.
-FROM openjdk:17-jre-slim
+FROM openjdk:17-jdk-slim
 
 # Copy the exported site from the previous stage
 COPY --from=export /project/site/.kobweb .kobweb
