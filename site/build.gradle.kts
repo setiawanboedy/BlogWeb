@@ -77,3 +77,8 @@ kotlin {
 tasks.kobwebCleanSite{
     enabled =false
 }
+
+tasks.register<Copy>("copyKobwebResources") {
+    from(layout.buildDirectory.dir("processedResources/js/main"))
+    into(layout.buildDirectory.dir("distributions"))
+}
