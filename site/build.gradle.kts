@@ -74,10 +74,6 @@ kotlin {
     }
 }
 
-tasks.getByName<Test>("test"){
-    enabled = false
-}
-
-tasks.getByName<Test>("jsTest"){
-    enabled = false
+tasks.kobwebCleanSite{
+    enabled =false
 }
