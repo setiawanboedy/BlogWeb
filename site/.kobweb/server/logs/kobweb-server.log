@@ -1,5 +1,5 @@
-2024-09-11 23:05:49.068 [main] INFO  ktor.application - Autoreload is disabled because the development mode is off.
-2024-09-11 23:05:49.089 [main] INFO  ktor.application - API jar found and will be loaded: ".kobweb\site\system\blogweb.jar"
-2024-09-11 23:05:49.204 [main] INFO  ktor.application - Loaded and initialized server API jar in 3ms.
-2024-09-11 23:05:49.262 [main] INFO  ktor.application - Application started in 0.219 seconds.
-2024-09-11 23:05:49.450 [DefaultDispatcher-worker-1] INFO  ktor.application - Responding at http://127.0.0.1:8080
+2024-09-12 00:22:55.335 [main] INFO  ktor.application - Autoreload is disabled because the development mode is off.
+2024-09-12 00:22:55.350 [main] INFO  ktor.application - API jar found and will be loaded: ".kobweb\site\system\blogweb.jar"
+2024-09-12 00:22:55.452 [main] INFO  ktor.application - Loaded and initialized server API jar in 3ms.
+2024-09-12 00:22:55.517 [main] INFO  ktor.application - Application started in 0.21 seconds.
+2024-09-12 00:22:55.701 [DefaultDispatcher-worker-1] INFO  ktor.application - Responding at http://127.0.0.1:8080

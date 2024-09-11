@@ -66,9 +66,5 @@ kotlin {
             // implementation(libs.kobwebx.markdown)
 
         }
-        jvmMain.dependencies {
-            compileOnly(libs.kobweb.api) // Provided by Kobweb backend at runtime
-            implementation(libs.kotlinx.serialization)
-        }
     }
 }
