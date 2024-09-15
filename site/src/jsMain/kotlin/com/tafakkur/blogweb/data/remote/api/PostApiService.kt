@@ -13,7 +13,7 @@ import org.koin.core.Koin
 import org.koin.core.context.GlobalContext.get
 
 class PostApiService(private val client: HttpClient) {
-    var token = ""
+    private var token = ""
     init {
         val inject: Koin = get()
         val storage = inject.get<LocalStorageManager>()

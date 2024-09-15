@@ -1,10 +1,7 @@
 package com.tafakkur.blogweb.pages.post
 
 import androidx.compose.runtime.*
-import com.tafakkur.blogweb.components.CategoryNavigationItems
-import com.tafakkur.blogweb.components.ErrorView
-import com.tafakkur.blogweb.components.LoadingIndicator
-import com.tafakkur.blogweb.components.OverflowSidePanel
+import com.tafakkur.blogweb.components.*
 import com.tafakkur.blogweb.core.sealed.ApiResponse
 import com.tafakkur.blogweb.dto.PostResponse
 import com.tafakkur.blogweb.models.Constants.POST_ID_PARAM
@@ -52,7 +49,7 @@ fun PostDetailPage(){
     var showSections by remember { mutableStateOf(true) }
     var postResponse by remember { mutableStateOf(PostResponse()) }
     var isSuccess by remember { mutableStateOf(false) }
-    var isLoading by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(true) }
     var isError by remember { mutableStateOf(false) }
     val hasPostIdParam = remember(key1 = context.route){
         context.route.params.containsKey(POST_ID_PARAM)

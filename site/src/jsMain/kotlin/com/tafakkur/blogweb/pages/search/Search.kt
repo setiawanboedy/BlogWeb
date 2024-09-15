@@ -2,7 +2,6 @@ package com.tafakkur.blogweb.pages.search
 
 import androidx.compose.runtime.*
 import com.tafakkur.blogweb.components.CategoryNavigationItems
-import com.tafakkur.blogweb.components.LoadingIndicator
 import com.tafakkur.blogweb.components.OverflowSidePanel
 import com.tafakkur.blogweb.core.sealed.ApiResponse
 import com.tafakkur.blogweb.dto.PostResponse

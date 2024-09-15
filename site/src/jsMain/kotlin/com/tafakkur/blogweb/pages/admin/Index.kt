@@ -4,7 +4,6 @@ import androidx.compose.runtime.*
 import com.tafakkur.blogweb.components.AdminPageLayout
 import com.tafakkur.blogweb.core.sealed.ApiResponse
 import com.tafakkur.blogweb.dto.DashboardResponse
-import com.tafakkur.blogweb.dto.PostResponse
 import com.tafakkur.blogweb.repository.PostRepository
 import com.tafakkur.blogweb.util.Constants.FONT_FAMILY
 import com.tafakkur.blogweb.util.Constants.SIDE_PANEL_WIDTH
@@ -20,7 +19,6 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.core.Page
-import com.varabyte.kobweb.core.rememberPageContext
 import com.varabyte.kobweb.silk.components.icons.fa.FaCode
 import com.varabyte.kobweb.silk.components.icons.fa.FaLaptop
 import com.varabyte.kobweb.silk.components.icons.fa.FaPaintbrush
@@ -47,14 +45,14 @@ fun HomePage() {
 fun HomeScreen() {
     val breakpoint = rememberBreakpoint()
     val scope = rememberCoroutineScope()
-    val context = rememberPageContext()
+//    val context = rememberPageContext()
 
     var dashboard by remember { mutableStateOf(DashboardResponse()) }
 
     val inject: Koin = get()
     val repository = inject.get<PostRepository>()
 
-    LaunchedEffect(key1 = context.route){
+    LaunchedEffect(key1 = Unit){
         scope.launch {
             when(val result = repository.getPostDashboard()){
                 is ApiResponse.Success -> {

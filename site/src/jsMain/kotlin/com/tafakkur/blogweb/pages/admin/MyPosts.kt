@@ -74,7 +74,7 @@ fun MyPostsScreen() {
     val inject: Koin = get()
     val repository = inject.get<PostRepository>()
 
-    LaunchedEffect(context.route) {
+    LaunchedEffect(Unit) {
         page = 0
         if (hasParams) {
             val search = query.replace("%20", " ")

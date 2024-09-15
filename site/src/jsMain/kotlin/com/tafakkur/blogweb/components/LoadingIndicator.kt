@@ -1,6 +1,5 @@
 package com.tafakkur.blogweb.components
 
-import androidx.compose.runtime.Composable
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
@@ -15,7 +14,6 @@ import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
 
-@Composable
 fun LoadingIndicator(
     modifier: Modifier = Modifier
 ){
